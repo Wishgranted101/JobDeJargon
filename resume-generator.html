@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Generator - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 3rem 20px;">
+        <h2 id="pageTitle" style="margin-bottom: 2rem;">Generate Resume</h2>
+
+        <!-- Job Context (readonly) -->
+        <div class="card" style="background: var(--surface); margin-bottom: 2rem;">
+            <h4>Target Job:</h4>
+            <p id="targetJobInfo" style="color: var(--text-secondary); margin-top: 0.5rem;">
+                No job selected. Please analyze a job first.
+            </p>
+        </div>
+
+        <!-- User Resume/Experience Input -->
+        <div class="form-group">
+            <label for="userResume">Your Current Resume / Experience:</label>
+            <textarea 
+                id="userResume" 
+                placeholder="Paste your current resume or key experience details here..."
+                style="min-height: 200px;"
+            ></textarea>
+        </div>
+
+        <!-- Tone Selector -->
+        <div class="form-group">
+            <label>Select Tone:</label>
+            <div class="selector-group" id="toneSelector">
+                <button class="selector-btn" data-tone="formal">🎩 Formal</button>
+                <button class="selector-btn active" data-tone="professional">💼 Professional</button>
+                <button class="selector-btn" data-tone="enthusiastic">⚡ Enthusiastic</button>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button id="generateBtn" class="btn-primary btn-large">✨ Generate</button>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+
+        <!-- Generated Output -->
+        <div id="generatedOutput" style="display: none; margin-top: 2rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generated Content</h3>
+                    <div class="card-actions">
+                        <button id="copyBtn" class="btn-secondary">📋 Copy</button>
+                        <button id="exportPdfBtn" class="btn-secondary" title="Pro Feature">📥 Export PDF</button>
+                        <button id="saveBtn" class="btn-primary" title="Pro Feature">💾 Save</button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div 
+                        id="generatedContent" 
+                        contenteditable="true"
+                        style="min-height: 400px; padding: 1rem; border: 1px solid var(--border); border-radius: 6px; background: white; font-family: 'Courier New', monospace; white-space: pre-wrap;"
+                    >
+                        <!-- Generated content will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pro Modal -->
+    <div id="proModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Pro Feature</h3>
+                <button class="modal-close" onclick="closeProModal()">&times;</button>
+            </div>
+            <p id="proModalMessage">This feature requires a Pro subscription.</p>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <a href="pro-features.html" class="btn-primary">Upgrade to Pro</a>
+                <button class="btn-secondary" onclick="closeProModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/resume-generator.js"></script>
+</body>
+</html>
