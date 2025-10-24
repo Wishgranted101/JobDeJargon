@@ -1,1 +1,261 @@
-tr
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Features - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 20px;">
+        <h2 style="text-align: center; margin-bottom: 1rem;">Unlock Pro Features</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+            Upgrade to Pro for unlimited analyses, company insights, document saves, and priority features.
+        </p>
+
+        <!-- Feature Tabs -->
+        <div class="selector-group" style="justify-content: center; margin-bottom: 3rem;">
+            <button class="selector-btn active" onclick="switchTab('unlimited')">🚀 Unlimited</button>
+            <button class="selector-btn" onclick="switchTab('company')">🏢 Company Analysis</button>
+            <button class="selector-btn" onclick="switchTab('documents')">📄 Documents</button>
+            <button class="selector-btn" onclick="switchTab('personas')">🎭 Personas</button>
+        </div>
+
+        <!-- Tab: Unlimited -->
+        <div id="unlimitedTab" class="tab-content">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h3 style="margin-bottom: 1rem;">Unlimited Everything</h3>
+                <ul style="line-height: 2; color: var(--text-secondary);">
+                    <li>✅ Priority API access for faster results</li>
+                    <li>✅ Export documents as PDF</li>
+                    <li>✅ Rich text editing for all documents</li>
+                    <li>✅ No daily limits or restrictions</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tab: Company Analysis -->
+        <div id="companyTab" class="tab-content" style="display: none;">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h3 style="margin-bottom: 1rem;">🏢 Company Analysis & Insights</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Get deep insights into companies before you apply.
+                </p>
+                
+                <!-- Sample Company Analysis -->
+                <div class="card" style="background: var(--surface); border: 2px dashed var(--border);">
+                    <h4 style="margin-bottom: 0.5rem;">Example: TechCorp Inc.</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div>
+                            <strong>Overall Rating:</strong><br>
+                            ⭐⭐⭐⭐ 4.2/5
+                        </div>
+                        <div>
+                            <strong>Culture Score:</strong><br>
+                            🎯 8.5/10
+                        </div>
+                        <div>
+                            <strong>Work-Life Balance:</strong><br>
+                            ⚖️ 7.8/10
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <strong>Pros:</strong>
+                        <ul style="color: var(--text-secondary); margin-top: 0.5rem;">
+                            <li>Competitive salaries and benefits</li>
+                            <li>Strong engineering culture</li>
+                            <li>Remote-friendly policies</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <strong>Cons:</strong>
+                        <ul style="color: var(--text-secondary); margin-top: 0.5rem;">
+                            <li>Fast-paced, high-pressure environment</li>
+                            <li>Limited upward mobility</li>
+                            <li>Meeting-heavy culture</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <strong>Salary Range for Senior Developer:</strong><br>
+                        💰 $110,000 - $145,000
+                    </div>
+                    
+                    <p style="margin-top: 1rem; padding: 1rem; background: var(--background); border-radius: 6px; font-size: 0.875rem;">
+                        🔒 <strong>Pro Feature:</strong> This detailed analysis is only available to Pro subscribers.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Documents -->
+        <div id="documentsTab" class="tab-content" style="display: none;">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h3 style="margin-bottom: 1rem;">📄 Save & Export Documents</h3>
+                <ul style="line-height: 2; color: var(--text-secondary);">
+                    <li>✅ Save unlimited resumes and cover letters</li>
+                    <li>✅ Rich text editor with formatting options</li>
+                    <li>✅ Export as PDF with professional styling</li>
+                    <li>✅ Copy to clipboard with one click</li>
+                    <li>✅ Version history and document management</li>
+                    <li>✅ Auto-save as you edit</li>
+                </ul>
+                
+                <div style="margin-top: 2rem; padding: 1.5rem; background: var(--surface); border-radius: 8px; border: 1px solid var(--border);">
+                    <strong>Free vs Pro:</strong>
+                    <table style="width: 100%; margin-top: 1rem; text-align: left;">
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <th style="padding: 0.5rem;">Feature</th>
+                            <th style="padding: 0.5rem;">Free</th>
+                            <th style="padding: 0.5rem;">Pro</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">Generate documents</td>
+                            <td style="padding: 0.5rem;">✅</td>
+                            <td style="padding: 0.5rem;">✅</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">Save documents</td>
+                            <td style="padding: 0.5rem;">❌</td>
+                            <td style="padding: 0.5rem;">✅</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">PDF export</td>
+                            <td style="padding: 0.5rem;">❌</td>
+                            <td style="padding: 0.5rem;">✅</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;">Rich text editing</td>
+                            <td style="padding: 0.5rem;">❌</td>
+                            <td style="padding: 0.5rem;">✅</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Personas -->
+        <div id="personasTab" class="tab-content" style="display: none;">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h3 style="margin-bottom: 1rem;">🎭 Expanded AI Personas</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Pro users get access to additional specialized AI personas for different contexts.
+                </p>
+                
+                <div class="persona-grid">
+                    <div class="persona-card">
+                        <h4>💪 Brutally Honest Coach</h4>
+                        <p>No sugarcoating. Tells it like it is.</p>
+                        <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
+                    </div>
+                    <div class="persona-card">
+                        <h4>🤝 Friendly Mentor</h4>
+                        <p>Supportive and professional guidance.</p>
+                        <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
+                    </div>
+                    <div class="persona-card">
+                        <h4>👔 HR Insider</h4>
+                        <p>Industry insights from the other side.</p>
+                        <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
+                    </div>
+                    <div class="persona-card">
+                        <h4>🏢 Corporate Translator</h4>
+                        <p>Decodes corporate speak objectively.</p>
+                        <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
+                    </div>
+                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
+                        <div class="badge" style="top: -10px;">Pro</div>
+                        <h4>🔥 Corporate Burnout Therapist</h4>
+                        <p>Identifies toxic patterns and red flags.</p>
+                    </div>
+                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
+                        <div class="badge" style="top: -10px;">Pro</div>
+                        <h4>🕵️ Recruiter Decoder</h4>
+                        <p>Reveals what recruiters really mean.</p>
+                    </div>
+                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
+                        <div class="badge" style="top: -10px;">Pro</div>
+                        <h4>🎯 Career Strategist</h4>
+                        <p>Long-term career planning perspective.</p>
+                    </div>
+                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
+                        <div class="badge" style="top: -10px;">Pro</div>
+                        <h4>💼 Salary Negotiation Coach</h4>
+                        <p>Focuses on compensation analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing CTA -->
+        <div class="card" style="max-width: 600px; margin: 3rem auto; text-align: center; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none;">
+            <h3 style="margin-bottom: 1rem; color: white;">Ready to Upgrade?</h3>
+            <p style="margin-bottom: 2rem; color: rgba(255,255,255,0.9);">
+                Get unlimited access to all Pro features for just $9.99/month.
+            </p>
+            <div class="price" style="color: white; margin-bottom: 1.5rem;">$9.99<span style="color: rgba(255,255,255,0.8);">/month</span></div>
+            <a href="signup.html" class="btn-secondary" style="background: white; color: var(--primary);">Upgrade Now</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.selector-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const tabMap = {
+                'unlimited': 'unlimitedTab',
+                'company': 'companyTab',
+                'documents': 'documentsTab',
+                'personas': 'personasTab'
+            };
+            
+            document.getElementById(tabMap[tabName]).style.display = 'block';
+            
+            // Mark button as active
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html> Unlimited job analyses per day</li>
+                    <li>✅ Unlimited resume & cover letter generations</li>
+                    <li>✅ Save unlimited jobs to dashboard</li>
+                    <li>✅
