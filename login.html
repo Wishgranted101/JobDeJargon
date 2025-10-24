@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="signup.html" class="btn-primary">Sign Up</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 20px; max-width: 500px;">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>
+        
+        <form id="loginForm" class="card">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
+            
+            <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+                Don't have an account? <a href="signup.html" style="color: var(--primary);">Sign up</a>
+            </p>
+        </form>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Simulate login (in production, use real auth)
+            userState.isLoggedIn = true;
+            userState.isPro = false; // Set to true for testing Pro features
+            saveUserState();
+            
+            showToast('Login successful!');
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
