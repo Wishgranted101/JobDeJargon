@@ -1,7 +1,7 @@
 # 1. Replace your vercel.json with the new one
 
 # 2. Update all links in HTML files (find & replace):
-Find: href="login.html"
+Find: href="login.html" 
 Replace: href="/login"
 
 Find: href="dashboard.html"
