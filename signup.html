@@ -1,1 +1,124 @@
-rt
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 20px; max-width: 600px;">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Create Your Account</h2>
+        
+        <div class="pricing-grid" style="margin-bottom: 3rem;">
+            <div class="pricing-card" id="freeCard" style="cursor: pointer;">
+                <h4>Free</h4>
+                <div class="price">$0</div>
+                <button class="btn-secondary" onclick="selectPlan('free')" type="button">Select Free</button>
+            </div>
+            <div class="pricing-card featured" id="proCard" style="cursor: pointer;">
+                <div class="badge">Popular</div>
+                <h4>Pro</h4>
+                <div class="price">$9.99<span>/month</span></div>
+                <button class="btn-primary" onclick="selectPlan('pro')" type="button">Select Pro</button>
+            </div>
+        </div>
+        
+        <form id="signupForm" class="card">
+            <input type="hidden" id="selectedPlan" value="free">
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" minlength="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+            
+            <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+                Already have an account? <a href="login.html" style="color: var(--primary);">Login</a>
+            </p>
+        </form>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/api.js"></script>
+    <script>
+        let selectedPlanValue = 'free';
+        
+        function selectPlan(plan) {
+            selectedPlanValue = plan;
+            document.getElementById('selectedPlan').value = plan;
+            
+            const freeCard = document.getElementById('freeCard');
+            const proCard = document.getElementById('proCard');
+            
+            if (plan === 'free') {
+                freeCard.style.borderColor = 'var(--primary)';
+                freeCard.style.borderWidth = '2px';
+                proCard.style.borderColor = 'var(--border)';
+                proCard.style.borderWidth = '1px';
+            } else {
+                proCard.style.borderColor = 'var(--primary)';
+                proCard.style.borderWidth = '2px';
+                freeCard.style.borderColor = 'var(--border)';
+                freeCard.style.borderWidth = '1px';
+            }
+            
+            showToast(`${plan === 'pro' ? 'Pro' : 'Free'} plan selected`);
+        }
+        
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match!');
+                return;
+            }
+            
+            // Simulate signup
+            userState.isLoggedIn = true;
+            userState.isPro = selectedPlanValue === 'pro';
+            saveUserState();
+            
+            showToast('Account created successfully!');
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
