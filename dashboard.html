@@ -1,1 +1,162 @@
-tr
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="settings.html">Settings</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <h2>Job Application Dashboard</h2>
+            <a href="job-analysis.html" class="btn-primary">+ Analyze New Job</a>
+        </div>
+
+        <div class="features-grid" style="margin-bottom: 3rem;">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h4 id="statAnalyzed">0</h4>
+                <p>Analyzed</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📤</div>
+                <h4 id="statApplied">0</h4>
+                <p>Applied</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h4 id="statInterviewed">0</h4>
+                <p>Interviewed</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎉</div>
+                <h4 id="statOffers">0</h4>
+                <p>Offers</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>📂 Analyzed</h3>
+            <div class="job-cards" id="analyzedSection">
+                <p style="color: var(--text-secondary);">No analyzed jobs yet. Start by analyzing a job description!</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>🕓 To Apply</h3>
+            <div class="job-cards" id="toApplySection">
+                <p style="color: var(--text-secondary);">Move jobs here when you're ready to apply.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>✅ Applied</h3>
+            <div class="job-cards" id="appliedSection">
+                <p style="color: var(--text-secondary);">No applications submitted yet.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>💬 Interviewed</h3>
+            <div class="job-cards" id="interviewedSection">
+                <p style="color: var(--text-secondary);">No interviews scheduled yet.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>🏆 Offers</h3>
+            <div class="job-cards" id="offersSection">
+                <p style="color: var(--text-secondary);">No offers received yet.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>❌ Rejected</h3>
+            <div class="job-cards" id="rejectedSection">
+                <p style="color: var(--text-secondary);">No rejections tracked.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="jobDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 id="modalJobTitle">Job Details</h3>
+                <button class="modal-close" onclick="closeJobDetailModal()">&times;</button>
+            </div>
+            <div id="modalJobContent" style="max-height: 500px; overflow-y: auto;"></div>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button id="modalMoveBtn" class="btn-secondary">Move To...</button>
+                <button id="modalDuplicateBtn" class="btn-secondary">📋 Duplicate</button>
+                <button id="modalDeleteBtn" class="btn-danger">🗑️ Delete</button>
+                <button class="btn-secondary" onclick="closeJobDetailModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="moveJobModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Move Job To:</h3>
+                <button class="modal-close" onclick="closeMoveJobModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button class="btn-secondary" onclick="moveJobTo('analyzed')">📂 Analyzed</button>
+                <button class="btn-secondary" onclick="moveJobTo('toApply')">🕓 To Apply</button>
+                <button class="btn-secondary" onclick="moveJobTo('applied')">✅ Applied</button>
+                <button class="btn-secondary" onclick="moveJobTo('interviewed')">💬 Interviewed</button>
+                <button class="btn-secondary" onclick="moveJobTo('offers')">🏆 Offers</button>
+                <button class="btn-secondary" onclick="moveJobTo('rejected')">❌ Rejected</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="terms-of-service.html">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="refund-policy.html">Refund Policy</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="index.html#faq">FAQ</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 JobDeJargon Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
