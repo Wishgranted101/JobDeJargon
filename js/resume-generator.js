@@ -8,7 +8,7 @@ let currentJob = null;
 let generatedContent = null;
 
 /**
- * Initialize page
+ * Initialize page 
  */
 document.addEventListener('DOMContentLoaded', () => {
     // Determine if generating resume or cover letter
