@@ -1,1 +1,107 @@
-tr
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Job - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 20px;">
+        <h2 style="margin-bottom: 2rem;">Analyze Job Description</h2>
+
+        <div class="form-group">
+            <label>Select Tone:</label>
+            <div class="selector-group" id="toneSelector">
+                <button class="selector-btn active" data-tone="snarky">😏 Snarky</button>
+                <button class="selector-btn" data-tone="professional">💼 Professional</button>
+                <button class="selector-btn" data-tone="formal">🎩 Formal</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Select AI Persona:</label>
+            <div class="selector-group" id="personaSelector">
+                <button class="selector-btn active" data-persona="brutally-honest">💪 Brutally Honest Coach</button>
+                <button class="selector-btn" data-persona="friendly-mentor">🤝 Friendly Mentor</button>
+                <button class="selector-btn" data-persona="hr-insider">👔 HR Insider</button>
+                <button class="selector-btn" data-persona="corporate-translator">🏢 Corporate Translator</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="jobDescription">Paste Job Description:</label>
+            <textarea 
+                id="jobDescription" 
+                placeholder="Paste the full job description here..."
+                style="min-height: 250px;"
+            ></textarea>
+        </div>
+
+        <button id="analyzeBtn" class="btn-primary btn-large">🔍 Analyze This Job</button>
+
+        <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+
+        <div id="analysisOutput" style="display: none; margin-top: 2rem;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Analysis Results</h3>
+                    <div class="card-actions">
+                        <button id="saveAnalysisBtn" class="btn-secondary">💾 Save</button>
+                        <button id="generateResumeBtn" class="btn-primary" title="Pro Feature">🔒 Generate Resume (Pro)</button>
+                        <button id="generateCoverLetterBtn" class="btn-primary" title="Pro Feature">🔒 Cover Letter (Pro)</button>
+                    </div>
+                </div>
+                <div class="card-content" id="analysisContent" style="white-space: pre-wrap;"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="proModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upgrade to Pro</h3>
+                <button class="modal-close" onclick="closeProModal()">&times;</button>
+            </div>
+            <p id="proModalMessage">Upgrade to Pro for unlimited analyses and more features!</p>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <a href="pro-features.html" class="btn-primary">Learn More</a>
+                <button class="btn-secondary" onclick="closeProModal()">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/job-analysis.js"></script>
+</body>
+</html>
