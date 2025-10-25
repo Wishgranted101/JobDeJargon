@@ -1,33 +1,37 @@
-# 1. Replace your vercel.json with the new one
-
-# 2. Update all links in HTML files (find & replace):
-Find: href="login.html" 
-Replace: href="/login"
-
-Find: href="dashboard.html"
-Replace: href="/dashboard"
-
-# (etc. for all pages - see guide for complete list)
-
-# 3. Update JavaScript redirects:
-Find: window.location.href = 'dashboard.html';
-Replace: window.location.href = '/dashboard';
-
-# 4. Commit and push
-git add .
-git commit -m "Implement clean URLs"
-git push origin main
-```
-
-## ✨ Result:
-
-**Before:**
-```
-yoursite.com/login.html
-yoursite.com/job-analysis.html
-```
-
-**After:**
-```
-yoursite.com/login
-yoursite.com/job-analysis
+{
+  "version": 2,
+  "name": "jobdejargon-pro",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/signup", "destination": "/signup.html" },
+    { "source": "/job-analysis", "destination": "/job-analysis.html" },
+    { "source": "/resume-generator", "destination": "/resume-generator.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/pro-features", "destination": "/pro-features.html" },
+    { "source": "/settings", "destination": "/settings.html" }
+  ],
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/login.html", "destination": "/login", "permanent": true },
+    { "source": "/signup.html", "destination": "/signup", "permanent": true },
+    { "source": "/job-analysis.html", "destination": "/job-analysis", "permanent": true },
+    { "source": "/resume-generator.html", "destination": "/resume-generator", "permanent": true },
+    { "source": "/dashboard.html", "destination": "/dashboard", "permanent": true },
+    { "source": "/pro-features.html", "destination": "/pro-features", "permanent": true },
+    { "source": "/settings.html", "destination": "/settings", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
