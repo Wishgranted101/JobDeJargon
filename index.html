@@ -5,14 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobDeJargon Pro - The co-pilot that tells you if this job is actually worth it</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .faq-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+        .faq-question:hover {
+            background: var(--background);
+        }
+        .faq-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1.5rem;
+            color: var(--text-secondary);
+        }
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+    </style>
 </head>
-<body> 
-    <!-- Header Component -->
+<body>
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1>JobDeJargon Pro</h1>
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
                 </div>
                 <nav class="nav">
                     <a href="index.html">Home</a>
@@ -26,7 +65,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <div class="hero-content">
@@ -40,7 +78,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="features">
         <div class="container">
             <h3 class="section-title">How It Works</h3>
@@ -69,7 +106,6 @@
         </div>
     </section>
 
-    <!-- Persona Section -->
     <section class="personas">
         <div class="container">
             <h3 class="section-title">Pick Your AI Co-Pilot</h3>
@@ -94,7 +130,6 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
     <section class="pricing">
         <div class="container">
             <h3 class="section-title">Free vs Pro</h3>
@@ -103,14 +138,14 @@
                     <h4>Free</h4>
                     <div class="price">$0</div>
                     <ul class="pricing-features">
-                        <li>✅ Job analysis with AI</li>
+                        <li>✅ Unlimited job analysis</li>
                         <li>✅ All tone options</li>
-                        <li>✅ All personas</li>
-                        <li>✅ Generate resume & cover letter</li>
+                        <li>✅ All 4 AI personas</li>
                         <li>✅ Dashboard (requires account)</li>
-                        <li>❌ Save documents</li>
+                        <li>✅ Save analyzed jobs</li>
+                        <li>❌ AI Resume Generator</li>
+                        <li>❌ AI Cover Letter Generator</li>
                         <li>❌ Company analysis</li>
-                        <li>❌ Unlimited history</li>
                     </ul>
                     <a href="signup.html" class="btn-secondary">Get Started Free</a>
                 </div>
@@ -120,12 +155,12 @@
                     <div class="price">$9.99<span>/month</span></div>
                     <ul class="pricing-features">
                         <li>✅ Everything in Free</li>
-                        <li>✅ Save & export documents</li>
+                        <li>✅ AI Resume Generator</li>
+                        <li>✅ AI Cover Letter Generator</li>
+                        <li>✅ Save & export documents as PDF</li>
                         <li>✅ Company analysis & ratings</li>
-                        <li>✅ Unlimited saved jobs</li>
-                        <li>✅ Persona expansions</li>
+                        <li>✅ Persona expansions (4 more)</li>
                         <li>✅ Rich text editor</li>
-                        <li>✅ PDF export</li>
                         <li>✅ Priority support</li>
                     </ul>
                     <a href="signup.html" class="btn-primary">Upgrade to Pro</a>
@@ -134,7 +169,125 @@
         </div>
     </section>
 
-    <!-- Footer Component -->
+    <section class="features" id="faq" style="background: var(--surface);">
+        <div class="container">
+            <h3 class="section-title">Frequently Asked Questions</h3>
+            <div style="max-width: 800px; margin: 0 auto;">
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How does JobDeJargon Pro work?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Simply paste any job description into our analyzer. Our AI (powered by Google Gemini) will translate the corporate jargon into plain language, highlight red flags, and give you an honest assessment of what the job really entails. You can choose different tones (Snarky, Professional, Formal) and AI personas to get the perspective that works best for you.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Is JobDeJargon Pro really free?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! The Free tier gives you <strong>unlimited job analyses</strong>, access to all tones and personas, and a dashboard to track jobs (with account). The AI Resume and Cover Letter generators are Pro-only features. Pro users ($9.99/month) also get document saves, company insights, PDF exports, and 4 additional AI personas.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What's the difference between tones and personas?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Tones</strong> control the style of the response (Snarky = witty and blunt, Professional = balanced, Formal = diplomatic). <strong>Personas</strong> determine who's giving you advice (Brutally Honest Coach, Friendly Mentor, HR Insider, or Corporate Translator). Mix and match to get the perfect perspective for your needs!</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I save and export my resumes and cover letters?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p><strong>Resume and Cover Letter generation is a Pro-only feature.</strong> Free users can analyze jobs unlimited times but cannot generate tailored application documents. Pro users ($9.99/month) can generate unlimited resumes and cover letters, save them, export as PDFs, and use a rich text editor for customization.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How accurate is the AI analysis?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Our AI uses Google's Gemini Pro model, which is highly advanced at understanding context and language. However, AI is a tool to help you make decisions—not make them for you. Always review the analysis and use your own judgment. Think of it as a second opinion from a knowledgeable friend, not gospel truth.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What are the Pro company insights?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Pro users get access to company analysis including ratings, culture scores, work-life balance indicators, pros/cons summaries, and salary ranges for specific positions. This helps you research companies before applying and make informed decisions about where to invest your time.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Is my data private and secure?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes. We take privacy seriously. Job descriptions you paste are processed by our AI to generate analyses but are not sold or shared with third parties. We use industry-standard encryption and security practices. Read our <a href="privacy-policy.html" style="color: var(--primary);">Privacy Policy</a> for full details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I cancel my Pro subscription anytime?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely! Cancel anytime from your account settings. Cancellation takes effect at the end of your current billing period, so you keep Pro access until then. We also offer a 7-day money-back guarantee for new Pro subscribers. See our <a href="refund-policy.html" style="color: var(--primary);">Refund Policy</a> for details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What happens to my saved jobs if I downgrade from Pro to Free?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Your saved jobs in the dashboard remain accessible, but you won't be able to save new documents or access Pro-only features like company analysis. Your existing saved resumes and cover letters will be archived and can be accessed again if you upgrade back to Pro.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Do you offer refunds?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! We offer a 7-day money-back guarantee for first-time Pro subscribers. If you're not satisfied within the first 7 days, contact us for a full refund. After that period, subscriptions are non-refundable, but you can cancel anytime to prevent future charges. Read our <a href="refund-policy.html" style="color: var(--primary);">Refund Policy</a> for complete details.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Still have questions?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We're here to help! Contact us at <a href="mailto:support@jobdejargon.com" style="color: var(--primary);">support@jobdejargon.com</a> or visit our <a href="contact.html" style="color: var(--primary);">Contact page</a>. We typically respond within 24-48 hours.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -149,15 +302,15 @@
                     <a href="pro-features.html">Pro Features</a>
                 </div>
                 <div class="footer-section">
-                    <h4>Account</h4>
-                    <a href="login.html">Login</a>
-                    <a href="signup.html">Sign Up</a>
-                    <a href="settings.html">Settings</a>
+                    <h4>Legal</h4>
+                    <a href="terms-of-service.html">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="refund-policy.html">Refund Policy</a>
                 </div>
                 <div class="footer-section">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <h4>Support</h4>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="#faq">FAQ</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -167,5 +320,21 @@
     </footer>
 
     <script src="js/api.js"></script>
+    <script>
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't active
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
