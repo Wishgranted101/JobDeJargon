@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 3rem 20px;">
+        <h1 style="text-align: center; margin-bottom: 1rem;">Contact Us</h1>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Have a question, feedback, or need support? We're here to help!
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">📧 Email Support</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">For general inquiries and support</p>
+                <a href="mailto:support@jobdejargon.com" style="color: var(--primary); font-weight: 500;">support@jobdejargon.com</a>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Response time: 24-48 hours</p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">💳 Billing Support</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">For billing, refunds, and subscriptions</p>
+                <a href="mailto:billing@jobdejargon.com" style="color: var(--primary); font-weight: 500;">billing@jobdejargon.com</a>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Response time: 24 hours</p>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">🔒 Privacy Inquiries</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">For data privacy and GDPR requests</p>
+                <a href="mailto:privacy@jobdejargon.com" style="color: var(--primary); font-weight: 500;">privacy@jobdejargon.com</a>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Response time: 48 hours</p>
+            </div>
+        </div>
+
+        <div style="max-width: 700px; margin: 0 auto;">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem;">Send Us a Message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" required placeholder="Your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" required placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <select id="subject" required>
+                            <option value="">-- Select a subject --</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="refund">Refund Request</option>
+                            <option value="bug">Report a Bug</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="partnership">Partnership Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" required placeholder="Tell us how we can help..." style="min-height: 150px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" required style="width: auto; margin-right: 0.5rem;">
+                            I agree to the <a href="privacy-policy.html" style="color: var(--primary);">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width: 100%;">Send Message</button>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+            <h3 style="margin-bottom: 2rem;">Frequently Asked Questions</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Looking for quick answers? Check out our <a href="index.html#faq" style="color: var(--primary);">FAQ section</a>
+            </p>
+        </div>
+
+        <div style="margin-top: 3rem; padding: 2rem; background: var(--surface); border-radius: 8px; text-align: center;">
+            <h3 style="margin-bottom: 1rem;">Need Immediate Help?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                For urgent issues, check our documentation or visit the help center
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="index.html#faq" class="btn-secondary">View FAQ</a>
+                <a href="settings.html" class="btn-secondary">Account Settings</a>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="terms-of-service.html">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="refund-policy.html">Refund Policy</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="index.html#faq">FAQ</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 JobDeJargon Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // In production, this would send to your backend
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+            
+            console.log('Contact form submitted:', formData);
+            
+            // Show success message
+            showToast('Message sent successfully! We\'ll get back to you within 24-48 hours.');
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>
