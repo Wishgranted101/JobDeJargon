@@ -97,6 +97,8 @@ body {
 .btn-primary {
     background: var(--primary);
     color: white;
+    font-weight: 700; /* Changed from 500 to 700 for bolder text */
+    letter-spacing: 0.3px; /* Slight spacing for clarity */
 }
 
 .btn-primary:hover {
@@ -810,14 +812,3 @@ body {
         grid-template-columns: 1fr;
     }
 
-/* Make Sign Up button text more visible */
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    font-weight: 600; /* Bolder text */
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Slight shadow for contrast */
-}
-
-.nav .btn-primary {
-    font-weight: 700; /* Even bolder for nav button */
-}
