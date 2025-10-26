@@ -21,6 +21,8 @@
             color: var(--text-primary);
             font-weight: 600;
         }
+        
+        /* CRITICAL: Modal styles for dashboard.js */
         .modal {
             display: none;
             position: fixed;
@@ -34,13 +36,14 @@
             justify-content: center;
         }
         .modal.active {
-            display: flex;
+            display: flex !important;
         }
         .modal-content {
             background: var(--background);
             padding: 2rem;
             border-radius: 8px;
-            max-width: 90%;
+            max-width: 800px;
+            width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -49,16 +52,23 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+        .modal-header h3 {
+            margin: 0;
         }
         .modal-close {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 2rem;
             cursor: pointer;
             color: var(--text-secondary);
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
         }
         .modal-close:hover {
             color: var(--text-primary);
