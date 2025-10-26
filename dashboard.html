@@ -200,5 +200,36 @@
 
     <script src="js/api.js"></script>
     <script src="js/dashboard.js"></script>
+    <script>
+        // Modal functionality for job details
+        function closeJobDetailModal() {
+            document.getElementById('jobDetailModal').style.display = 'none';
+        }
+
+        function closeMoveJobModal() {
+            document.getElementById('moveJobModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const jobModal = document.getElementById('jobDetailModal');
+            const moveModal = document.getElementById('moveJobModal');
+            
+            if (event.target == jobModal) {
+                jobModal.style.display = 'none';
+            }
+            if (event.target == moveModal) {
+                moveModal.style.display = 'none';
+            }
+        }
+
+        // These functions should be called by dashboard.js
+        // This is just a fallback to ensure modals work
+        function moveJobTo(category) {
+            console.log('Moving job to:', category);
+            closeMoveJobModal();
+            // Your dashboard.js should handle the actual move logic
+        }
+    </script>
 </body>
 </html>
