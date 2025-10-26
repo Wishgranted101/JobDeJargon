@@ -21,6 +21,48 @@
             color: var(--text-primary);
             font-weight: 600;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--background);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
@@ -200,36 +242,5 @@
 
     <script src="js/api.js"></script>
     <script src="js/dashboard.js"></script>
-    <script>
-        // Modal functionality for job details
-        function closeJobDetailModal() {
-            document.getElementById('jobDetailModal').style.display = 'none';
-        }
-
-        function closeMoveJobModal() {
-            document.getElementById('moveJobModal').style.display = 'none';
-        }
-
-        // Close modals when clicking outside
-        window.onclick = function(event) {
-            const jobModal = document.getElementById('jobDetailModal');
-            const moveModal = document.getElementById('moveJobModal');
-            
-            if (event.target == jobModal) {
-                jobModal.style.display = 'none';
-            }
-            if (event.target == moveModal) {
-                moveModal.style.display = 'none';
-            }
-        }
-
-        // These functions should be called by dashboard.js
-        // This is just a fallback to ensure modals work
-        function moveJobTo(category) {
-            console.log('Moving job to:', category);
-            closeMoveJobModal();
-            // Your dashboard.js should handle the actual move logic
-        }
-    </script>
 </body>
 </html>
