@@ -145,13 +145,15 @@ function extractJobTitle(description) {
 }
 
 /**
- * Update statistics
+ * Update statistics - FIXED to include all 6 categories
  */
 function updateStats() {
     document.getElementById('statAnalyzed').textContent = dashboardData.analyzed.length;
+    document.getElementById('statToApply').textContent = dashboardData.toApply.length;
     document.getElementById('statApplied').textContent = dashboardData.applied.length;
     document.getElementById('statInterviewed').textContent = dashboardData.interviewed.length;
     document.getElementById('statOffers').textContent = dashboardData.offers.length;
+    document.getElementById('statRejected').textContent = dashboardData.rejected.length;
 }
 
 /**
@@ -190,7 +192,8 @@ function openJobDetailModal(job, currentStatus) {
     modal.classList.add('active');
     
     document.getElementById('modalMoveBtn').onclick = () => {
-        closeMoveJobModalAndOpen();
+        closeJobDetailModal();
+        openMoveJobModal();
     };
     
     document.getElementById('modalDuplicateBtn').onclick = () => {
@@ -231,7 +234,7 @@ function formatStatus(status) {
 /**
  * Open move job modal
  */
-function closeMoveJobModalAndOpen() {
+function openMoveJobModal() {
     document.getElementById('moveJobModal').classList.add('active');
 }
 
