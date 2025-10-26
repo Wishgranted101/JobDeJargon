@@ -171,12 +171,18 @@
         </div>
     </main>
 
-    <footer class="footer">
+     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>JobDeJargon Pro</h4>
                     <p>The honest co-pilot for job seekers.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
                 </div>
                 <div class="footer-section">
                     <h4>Legal</h4>
@@ -185,9 +191,13 @@
                     <a href="refund-policy.html">Refund Policy</a>
                 </div>
                 <div class="footer-section">
+                    <h4>Company</h4>
+                     <a href="about.html">About Us</a>
+                    </div>
+                <div class="footer-section">
                     <h4>Support</h4>
                     <a href="contact.html">Contact Us</a>
-                    <a href="index.html#faq">FAQ</a>
+                     <a href="index.html#faq">FAQ</a>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -195,5 +205,23 @@
             </div>
         </div>
     </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't active
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
