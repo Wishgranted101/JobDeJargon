@@ -25,17 +25,6 @@ function checkFreeTierLimit() {
 }
 
 /**
- * Check if user can access Pro features (Personas)
- */
-function canUsePersonas() {
-    if (!isProUser()) {
-        showProModal('AI Personas are a Pro feature. Upgrade to access Brutally Honest Coach, HR Insider, and Corporate Translator!');
-        return false;
-    }
-    return true;
-}
-
-/**
  * Fetch job analysis - calls serverless function
  */
 async function fetchJobAnalysis(jobDescription, tone = 'professional', persona = 'friendly-mentor') {
@@ -44,11 +33,8 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
         throw new Error('Free tier limit exceeded');
     }
 
-    // Check if trying to use Pro persona
-    if (persona !== 'friendly-mentor' && !isProUser()) {
-        showProModal('This AI Persona is a Pro feature. Upgrade to unlock all personas!');
-        throw new Error('Pro feature required');
-    }
+    // For free users, ALWAYS use friendly-mentor regardless of what's selected
+    const actualPersona = isProUser() ? persona : 'friendly-mentor';
 
     try {
         showSpinner();
@@ -62,7 +48,7 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
             body: JSON.stringify({
                 jobDescription,
                 tone,
-                persona
+                persona: actualPersona  // Use the corrected persona
             })
         });
 
@@ -98,19 +84,40 @@ function initProFeatureLocks() {
             if (personaValue !== 'friendly-mentor') {
                 // Add pro lock indicator
                 button.classList.add('pro-locked');
-                const lockIcon = document.createElement('span');
-                lockIcon.innerHTML = '🔒';
-                lockIcon.className = 'pro-lock-icon';
-                button.appendChild(lockIcon);
+                
+                // Add lock icon if not already present
+                if (!button.querySelector('.pro-lock-icon')) {
+                    const lockIcon = document.createElement('span');
+                    lockIcon.innerHTML = ' 🔒';
+                    lockIcon.className = 'pro-lock-icon';
+                    button.appendChild(lockIcon);
+                }
                 
                 // Add click handler to show upgrade modal
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     showProModal('Unlock all AI Personas with Pro! Get access to Brutally Honest Coach, HR Insider, and Corporate Translator.');
+                    
+                    // Auto-select Friendly Mentor instead
+                    const friendlyMentorBtn = document.querySelector('[data-persona="friendly-mentor"]');
+                    if (friendlyMentorBtn) {
+                        // Remove active from all persona buttons
+                        document.querySelectorAll('[data-persona]').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        // Activate friendly mentor
+                        friendlyMentorBtn.classList.add('active');
+                    }
                 });
             }
         });
+        
+        // Ensure Friendly Mentor is selected by default for free users
+        const friendlyMentorBtn = document.querySelector('[data-persona="friendly-mentor"]');
+        if (friendlyMentorBtn && !document.querySelector('[data-persona].active')) {
+            friendlyMentorBtn.classList.add('active');
+        }
     }
 }
 
@@ -121,9 +128,15 @@ function getSelectedOptions() {
     const toneButton = document.querySelector('[data-tone].active');
     const personaButton = document.querySelector('[data-persona].active');
     
+    // Default to friendly-mentor for free users
+    let persona = personaButton ? personaButton.getAttribute('data-persona') : 'friendly-mentor';
+    if (!isProUser() && persona !== 'friendly-mentor') {
+        persona = 'friendly-mentor';
+    }
+    
     return {
         tone: toneButton ? toneButton.getAttribute('data-tone') : 'professional',
-        persona: personaButton ? personaButton.getAttribute('data-persona') : 'friendly-mentor'
+        persona: persona
     };
 }
 
