@@ -1,5 +1,5 @@
 /**
- * API.js - Frontend logic with Pro feature gating
+ * API.js - Now calls secure serverless function
  */
 
 const API_CONFIG = {
@@ -25,21 +25,18 @@ function checkFreeTierLimit() {
 }
 
 /**
- * Fetch job analysis - calls serverless function
+ * Fetch job analysis - NOW CALLS SERVERLESS FUNCTION (Secure!)
  */
 async function fetchJobAnalysis(jobDescription, tone = 'professional', persona = 'friendly-mentor') {
     if (!checkFreeTierLimit()) {
-        showToast('You\'ve reached your free limit (5/day). Upgrade to Pro for unlimited analyses!');
+        showToast('You\'ve reached your free limit (5/day). Upgrade to Pro for unlimited!');
         throw new Error('Free tier limit exceeded');
     }
 
-    // For free users, ALWAYS use friendly-mentor regardless of what's selected
-    const actualPersona = isProUser() ? persona : 'friendly-mentor';
-
     try {
         showSpinner();
-        
-        // Call serverless function
+       
+        // Call YOUR serverless function (not Gemini directly)
         const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: {
@@ -48,7 +45,7 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
             body: JSON.stringify({
                 jobDescription,
                 tone,
-                persona: actualPersona  // Use the corrected persona
+                persona
             })
         });
 
@@ -57,87 +54,42 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
         }
 
         const data = await response.json();
-        
+       
         userState.usageCount++;
         saveUserState();
-        
+       
         hideSpinner();
         return data.analysis;
-        
+       
     } catch (error) {
         hideSpinner();
         console.error('Error fetching job analysis:', error);
-        showToast('Analysis failed. Please try again.');
-        throw error;
+        return getMockJobAnalysis(tone, persona);
     }
 }
 
 /**
- * Initialize Pro feature locks on page load
+ * Mock data for demo/fallback
  */
-function initProFeatureLocks() {
-    if (!isProUser()) {
-        // Lock all persona buttons except Friendly Mentor
-        const personaButtons = document.querySelectorAll('[data-persona]');
-        personaButtons.forEach(button => {
-            const personaValue = button.getAttribute('data-persona');
-            if (personaValue !== 'friendly-mentor') {
-                // Add pro lock indicator
-                button.classList.add('pro-locked');
-                
-                // Add lock icon if not already present
-                if (!button.querySelector('.pro-lock-icon')) {
-                    const lockIcon = document.createElement('span');
-                    lockIcon.innerHTML = ' 🔒';
-                    lockIcon.className = 'pro-lock-icon';
-                    button.appendChild(lockIcon);
-                }
-                
-                // Add click handler to show upgrade modal
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    showProModal('Unlock all AI Personas with Pro! Get access to Brutally Honest Coach, HR Insider, and Corporate Translator.');
-                    
-                    // Auto-select Friendly Mentor instead
-                    const friendlyMentorBtn = document.querySelector('[data-persona="friendly-mentor"]');
-                    if (friendlyMentorBtn) {
-                        // Remove active from all persona buttons
-                        document.querySelectorAll('[data-persona]').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        // Activate friendly mentor
-                        friendlyMentorBtn.classList.add('active');
-                    }
-                });
-            }
-        });
-        
-        // Ensure Friendly Mentor is selected by default for free users
-        const friendlyMentorBtn = document.querySelector('[data-persona="friendly-mentor"]');
-        if (friendlyMentorBtn && !document.querySelector('[data-persona].active')) {
-            friendlyMentorBtn.classList.add('active');
-        }
-    }
-}
+function getMockJobAnalysis(tone, persona) {
+    return `**Real Job Title**: Sample Position
 
-/**
- * Get selected tone and persona from UI
- */
-function getSelectedOptions() {
-    const toneButton = document.querySelector('[data-tone].active');
-    const personaButton = document.querySelector('[data-persona].active');
-    
-    // Default to friendly-mentor for free users
-    let persona = personaButton ? personaButton.getAttribute('data-persona') : 'friendly-mentor';
-    if (!isProUser() && persona !== 'friendly-mentor') {
-        persona = 'friendly-mentor';
-    }
-    
-    return {
-        tone: toneButton ? toneButton.getAttribute('data-tone') : 'professional',
-        persona: persona
-    };
+**Key Responsibilities**:
+• Sample responsibility 1
+• Sample responsibility 2
+
+**Required Skills**:
+• Must-haves: Sample skills
+• Nice-to-haves: Additional skills
+
+**Red Flags**:
+⚠️ This is mock data - add your API key to see real analysis
+
+**Salary Expectations**:
+$XX,XXX - $XX,XXX
+
+**Bottom Line**:
+This is demo data. Configure your API key for real analysis.`;
 }
 
 function showProModal(message) {
@@ -212,14 +164,6 @@ function saveUserState() {
     saveToLocal('userState', userState);
 }
 
-// Initialize on page load
 if (typeof window !== 'undefined') {
     initUserState();
-    
-    // Initialize Pro locks when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initProFeatureLocks);
-    } else {
-        initProFeatureLocks();
-    }
 }
