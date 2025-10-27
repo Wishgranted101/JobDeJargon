@@ -1,5 +1,7 @@
 /**
  * Vercel Serverless Function - Job Analysis
+ * This keeps your API key safe on the server
+ * 
  * File location: /api/analyze.js
  */
 
@@ -24,8 +26,8 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'API key not configured' });
         }
 
-        // Build the prompt using the Job Dejargonator format
-        const prompt = buildJobDejargonatorPrompt(jobDescription, tone || 'professional', persona || 'friendly-mentor');
+        // Build the prompt
+        const prompt = buildJobAnalysisPrompt(jobDescription, tone || 'professional', persona || 'friendly-mentor');
 
         // Call Gemini API
         const response = await fetch(
@@ -77,78 +79,53 @@ export default async function handler(req, res) {
 }
 
 /**
- * Build Job Dejargonator prompt with tone and persona
+ * Build prompt for job analysis - UPDATED WITH YOUR FORMAT
  */
-function buildJobDejargonatorPrompt(jobDescription, tone, persona) {
-    // Base system instruction - always included
-    const systemInstruction = `You are the "Job Dejargonator," an expert career coach and linguistic analyst. Your role is to critically examine corporate jargon in a job description and translate it into clear, actionable sections.`;
-
-    // Tone instructions - affects HOW the analysis is written
+function buildJobAnalysisPrompt(jobDescription, tone, persona) {
     const toneInstructions = {
-        'snarky': 'Write with wit, sarcasm, and brutal honesty. Point out absurdities and unrealistic expectations with humor. Use phrases like "Translation: They want a unicorn for peanuts" or "In other words, prepare to be overworked."',
-        'professional': 'Maintain a balanced, constructive, and professional tone. Be direct but diplomatic. Provide objective analysis without excessive criticism.',
-        'formal': 'Use formal, structured, and diplomatic language. Maintain utmost professionalism. Avoid casual language or humor entirely.'
+        'snarky': 'Be witty, sarcastic, and brutally honest. Point out red flags and unrealistic expectations.',
+        'professional': 'Be balanced, constructive, and professional. Provide objective analysis.',
+        'formal': 'Be formal, structured, and diplomatic. Use professional language throughout.'
     };
 
-    // Persona instructions - affects the PERSPECTIVE and expertise
     const personaInstructions = {
-        'brutally-honest': 'Act as a no-nonsense career coach who tells it like it is. Don\'t sugarcoat red flags. Call out unrealistic expectations directly.',
-        'friendly-mentor': 'Act as a supportive mentor who provides encouraging guidance while being honest about challenges. Balance criticism with constructive advice.',
-        'hr-insider': 'Act as an HR professional with insider knowledge. Reveal what companies really mean behind the corporate speak. Explain hiring practices and expectations.',
-        'corporate-translator': 'Act as a neutral, expert translator who objectively decodes corporate jargon into plain language. Focus purely on accurate translation without judgment.'
+        'brutally-honest': 'Act as a no-nonsense career coach who tells it like it is.',
+        'friendly-mentor': 'Act as a supportive mentor who provides encouraging guidance.',
+        'hr-insider': 'Act as an HR professional with insider knowledge of hiring practices.',
+        'corporate-translator': 'Act as a neutral translator who decodes corporate jargon objectively.'
     };
 
-    const selectedTone = toneInstructions[tone] || toneInstructions['professional'];
-    const selectedPersona = personaInstructions[persona] || personaInstructions['friendly-mentor'];
+    return `You are the "Job Dejargonator," an expert career coach and linguistic analyst. ${personaInstructions[persona] || personaInstructions['friendly-mentor']} ${toneInstructions[tone] || toneInstructions['professional']}
 
-    // Build the complete prompt
-    return `${systemInstruction}
-
-${selectedPersona} ${selectedTone}
-
-Your output must STRICTLY follow this format:
+Your output must follow this format:
 
 ## What They Really Mean (The Translation):
-For 5-7 distinct pieces of jargon or vague corporate language found in the job description, provide a short, clear, plain-language translation of what the company is actually looking for. Use bullet points. Each bullet should:
-- Quote the specific jargon from the job description
-- Translate it into plain language
-- Explain what skill, duty, or mindset they actually want
-
-Example format:
-• "Synergistic growth enabler" → They want a marketing/operations generalist who can wear multiple hats
-• "Cross-functional deep dives" → You'll attend lots of meetings with different departments
-• "High-velocity environment" → Expect tight deadlines and frequent pivots
+For 5-7 pieces of jargon or vague language from the job description, translate them into plain language. Use bullets:
+• "Quote the jargon" → Plain language explanation of what they really want
 
 ## Action Plan: How to Tailor Your Resume:
-Provide 3-4 specific, concrete, and MEASURABLE instructions on how the applicant should rewrite their resume to directly address the translated needs. Focus on:
-- Using action verbs that match the job description
-- Adding quantifiable metrics and achievements
-- Aligning language with the company's terminology
-- Specific sections to update (Summary, Skills, Experience)
-
-Example format:
-1. In your Summary section, replace generic phrases with: "Results-driven professional with 5+ years driving cross-functional collaboration..." Include metrics showing team size or projects managed.
-2. Under Skills, add: "Agile methodologies, stakeholder management, data-driven decision making" - directly matching their requirements.
-3. Rewrite 2-3 bullet points in your Experience section to include: "Led cross-functional initiatives resulting in X% growth" or "Drove strategic partnerships across Y verticals."
+Provide 3-4 specific, measurable instructions on how to update their resume. Each should include:
+- Which section to update (Summary, Skills, Experience)
+- Specific keywords or phrases to add
+- Example of how to quantify achievements
+1. [First specific instruction with example]
+2. [Second specific instruction with example]
+3. [Third specific instruction with example]
+4. [Fourth specific instruction with example]
 
 ## Salary Expectations:
-Provide a realistic salary range based on:
-- The seniority level indicated by the requirements
-- Market rates for this type of role
-- Geographic considerations (if mentioned)
-- Red flags that might indicate lower compensation
-
-Format: $XX,XXX - $XX,XXX (with brief explanation)
+$XX,XXX - $XX,XXX based on the requirements
 
 ## Red Flags:
-List 2-4 warning signs or unrealistic expectations found in the job description. Be specific about what's concerning and why.
+List 2-4 warning signs
 
 ## Bottom Line:
-One paragraph summary: Should they apply? What's the real opportunity here? Any final advice?
+Should they apply? Final advice in one paragraph.
 
 ---
 
-Now analyze this job description following the format above:
+Job Description:
+${jobDescription}
 
-${jobDescription}`;
+Provide a clear analysis following the format above:`;
 }
