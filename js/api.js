@@ -1,5 +1,5 @@
 /**
- * API.js - Now calls secure serverless function
+ * API.js - Frontend logic with Pro feature gating
  */
 
 const API_CONFIG = {
@@ -25,18 +25,35 @@ function checkFreeTierLimit() {
 }
 
 /**
- * Fetch job analysis - NOW CALLS SERVERLESS FUNCTION (Secure!)
+ * Check if user can access Pro features (Personas)
+ */
+function canUsePersonas() {
+    if (!isProUser()) {
+        showProModal('AI Personas are a Pro feature. Upgrade to access Brutally Honest Coach, HR Insider, and Corporate Translator!');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Fetch job analysis - calls serverless function
  */
 async function fetchJobAnalysis(jobDescription, tone = 'professional', persona = 'friendly-mentor') {
     if (!checkFreeTierLimit()) {
-        showToast('You\'ve reached your free limit (5/day). Upgrade to Pro for unlimited!');
+        showToast('You\'ve reached your free limit (5/day). Upgrade to Pro for unlimited analyses!');
         throw new Error('Free tier limit exceeded');
+    }
+
+    // Check if trying to use Pro persona
+    if (persona !== 'friendly-mentor' && !isProUser()) {
+        showProModal('This AI Persona is a Pro feature. Upgrade to unlock all personas!');
+        throw new Error('Pro feature required');
     }
 
     try {
         showSpinner();
         
-        // Call YOUR serverless function (not Gemini directly)
+        // Call serverless function
         const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: {
@@ -64,32 +81,50 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
     } catch (error) {
         hideSpinner();
         console.error('Error fetching job analysis:', error);
-        return getMockJobAnalysis(tone, persona);
+        showToast('Analysis failed. Please try again.');
+        throw error;
     }
 }
 
 /**
- * Mock data for demo/fallback
+ * Initialize Pro feature locks on page load
  */
-function getMockJobAnalysis(tone, persona) {
-    return `**Real Job Title**: Sample Position
+function initProFeatureLocks() {
+    if (!isProUser()) {
+        // Lock all persona buttons except Friendly Mentor
+        const personaButtons = document.querySelectorAll('[data-persona]');
+        personaButtons.forEach(button => {
+            const personaValue = button.getAttribute('data-persona');
+            if (personaValue !== 'friendly-mentor') {
+                // Add pro lock indicator
+                button.classList.add('pro-locked');
+                const lockIcon = document.createElement('span');
+                lockIcon.innerHTML = '🔒';
+                lockIcon.className = 'pro-lock-icon';
+                button.appendChild(lockIcon);
+                
+                // Add click handler to show upgrade modal
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showProModal('Unlock all AI Personas with Pro! Get access to Brutally Honest Coach, HR Insider, and Corporate Translator.');
+                });
+            }
+        });
+    }
+}
 
-**Key Responsibilities**:
-• Sample responsibility 1
-• Sample responsibility 2
-
-**Required Skills**:
-• Must-haves: Sample skills
-• Nice-to-haves: Additional skills
-
-**Red Flags**:
-⚠️ This is mock data - add your API key to see real analysis
-
-**Salary Expectations**: 
-$XX,XXX - $XX,XXX
-
-**Bottom Line**: 
-This is demo data. Configure your API key for real analysis.`;
+/**
+ * Get selected tone and persona from UI
+ */
+function getSelectedOptions() {
+    const toneButton = document.querySelector('[data-tone].active');
+    const personaButton = document.querySelector('[data-persona].active');
+    
+    return {
+        tone: toneButton ? toneButton.getAttribute('data-tone') : 'professional',
+        persona: personaButton ? personaButton.getAttribute('data-persona') : 'friendly-mentor'
+    };
 }
 
 function showProModal(message) {
@@ -164,6 +199,14 @@ function saveUserState() {
     saveToLocal('userState', userState);
 }
 
+// Initialize on page load
 if (typeof window !== 'undefined') {
     initUserState();
+    
+    // Initialize Pro locks when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProFeatureLocks);
+    } else {
+        initProFeatureLocks();
+    }
 }
