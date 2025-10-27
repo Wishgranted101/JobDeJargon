@@ -1,7 +1,7 @@
 /**
  * Vercel Serverless Function - Job Analysis
  * This keeps your API key safe on the server
- * 
+ *
  * File location: /api/analyze.js
  */
 
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    try { 
+    try {
         const { jobDescription, tone, persona } = req.body;
 
         // Validate input
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
         // Get API key from environment variable (safely stored in Vercel)
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-        
+       
         if (!GEMINI_API_KEY) {
             return res.status(500).json({ error: 'API key not configured' });
         }
@@ -54,9 +54,9 @@ export default async function handler(req, res) {
         if (!response.ok) {
             const errorData = await response.text();
             console.error('Gemini API Error:', errorData);
-            return res.status(response.status).json({ 
+            return res.status(response.status).json({
                 error: 'Failed to analyze job',
-                details: errorData 
+                details: errorData
             });
         }
 
@@ -64,22 +64,22 @@ export default async function handler(req, res) {
         const analysis = data.candidates[0].content.parts[0].text;
 
         // Return the analysis
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
-            analysis: analysis 
+            analysis: analysis
         });
 
     } catch (error) {
         console.error('Server error:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: 'Internal server error',
-            message: error.message 
+            message: error.message
         });
     }
 }
 
 /**
- * Build prompt for job analysis - UPDATED WITH YOUR FORMAT
+ * Build prompt for job analysis
  */
 function buildJobAnalysisPrompt(jobDescription, tone, persona) {
     const toneInstructions = {
@@ -95,37 +95,18 @@ function buildJobAnalysisPrompt(jobDescription, tone, persona) {
         'corporate-translator': 'Act as a neutral translator who decodes corporate jargon objectively.'
     };
 
-    return `You are the "Job Dejargonator," an expert career coach and linguistic analyst. ${personaInstructions[persona] || personaInstructions['friendly-mentor']} ${toneInstructions[tone] || toneInstructions['professional']}
+    return `You are analyzing a job description. ${personaInstructions[persona] || personaInstructions['friendly-mentor']} ${toneInstructions[tone] || toneInstructions['professional']}
 
-Your output must follow this format:
-
-## What They Really Mean (The Translation):
-For 5-7 pieces of jargon or vague language from the job description, translate them into plain language. Use bullets:
-• "Quote the jargon" → Plain language explanation of what they really want
-
-## Action Plan: How to Tailor Your Resume:
-Provide 3-4 specific, measurable instructions on how to update their resume. Each should include:
-- Which section to update (Summary, Skills, Experience)
-- Specific keywords or phrases to add
-- Example of how to quantify achievements
-1. [First specific instruction with example]
-2. [Second specific instruction with example]
-3. [Third specific instruction with example]
-4. [Fourth specific instruction with example]
-
-## Salary Expectations:
-$XX,XXX - $XX,XXX based on the requirements
-
-## Red Flags:
-List 2-4 warning signs
-
-## Bottom Line:
-Should they apply? Final advice in one paragraph.
-
----
+Analyze this job description and provide:
+1. **Real Job Title**: What this role actually is
+2. **Key Responsibilities**: What you'll actually be doing
+3. **Required Skills**: Must-haves vs nice-to-haves
+4. **Red Flags**: Warning signs or unrealistic expectations
+5. **Salary Expectations**: Realistic range based on requirements
+6. **Bottom Line**: Should you apply or run?
 
 Job Description:
 ${jobDescription}
 
-Provide a clear analysis following the format above:`;
+Provide a clear, structured analysis:`;
 }
