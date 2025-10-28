@@ -6,7 +6,7 @@
     <title>Login - JobDeJargon Pro</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body> 
+<body>
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -27,7 +27,7 @@
         <form id="loginForm" class="card">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="your@email.com">
+                <input type="email" id="email" required placeholder="your@email.com" autofocus>
             </div>
             
             <div class="form-group">
@@ -35,32 +35,106 @@
                 <input type="password" id="password" required placeholder="••••••••">
             </div>
             
-            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
+            <div style="text-align: right; margin-bottom: 1rem;">
+                <a href="#" id="forgotPasswordLink" style="color: var(--primary); font-size: 0.9rem; text-decoration: none;">
+                    Forgot password?
+                </a>
+            </div>
+            
+            <button type="submit" id="loginBtn" class="btn-primary" style="width: 100%;">
+                Login
+            </button>
             
             <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
-                Don't have an account? <a href="signup.html" style="color: var(--primary);">Sign up</a>
+                Don't have an account? <a href="signup.html" style="color: var(--primary);">Sign up free</a>
             </p>
         </form>
     </main>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reset Password</h3>
+                <button class="modal-close" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Enter your email and we'll send you a reset link.
+            </p>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <input type="email" id="resetEmail" required placeholder="your@email.com">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    Send Reset Link
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
 
+    <!-- Load Supabase and Auth -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
+    
     <script>
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Simulate login (in production, use real auth)
-            userState.isLoggedIn = true;
-            userState.isPro = false; // Set to true for testing Pro features
-            saveUserState();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('loginBtn');
             
-            showToast('Login successful!');
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
             
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000);
+            // Login
+            const result = await login(email, password);
+            
+            if (result.success) {
+                showToast('Login successful! Redirecting...');
+                
+                setTimeout(() => {
+                    // Check if there's a redirect destination
+                    const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'job-analysis.html';
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectTo;
+                }, 1000);
+            } else {
+                showToast(result.message || 'Login failed. Please check your credentials.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
         });
+        
+        // Forgot password link
+        document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('forgotPasswordModal').classList.add('active');
+        });
+        
+        // Forgot password form
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value.trim();
+            const result = await resetPassword(email);
+            
+            if (result.success) {
+                showToast(result.message);
+                closeForgotPasswordModal();
+            } else {
+                showToast(result.message || 'Error sending reset email');
+            }
+        });
+        
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('active');
+        }
     </script>
 </body>
 </html>
