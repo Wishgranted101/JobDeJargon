@@ -1,11 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analyze Job - JobDeJargon Pro</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles for the layout and animations */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #6b7280;
+            --secondary-dark: #4b5563;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .nav a {
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+            color: #4b5563;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: background-color 0.15s;
+        }
+        .nav a:hover {
+            background-color: #f3f4f6;
+        }
+        .nav .btn-secondary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        .nav .btn-secondary:hover {
+            background-color: var(--primary-dark);
+        }
+        .container {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        /* Form Group Styles */
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Selector Button Styles */
+        .selector-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .selector-btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px; /* Pill shape */
+            border: 2px solid #d1d5db;
+            background-color: white;
+            color: #4b5563;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .selector-btn:hover {
+            border-color: #9ca3af;
+        }
+        .selector-btn.active {
+            border-color: var(--primary);
+            background-color: #eef2ff; /* indigo-50 */
+            color: var(--primary-dark);
+            font-weight: 600;
+            transform: scale(1.02);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.15s, transform 0.1s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            border: 1px solid #d1d5db;
+            transition: background-color 0.15s;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #e5e7eb;
+        }
+
+        .btn-large {
+            width: 100%;
+            font-size: 1.125rem;
+            padding: 1rem 1.5rem;
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            border-top: 4px solid var(--primary);
+        }
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Utility Styles */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .disclaimer-notice {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            background-color: #fef3c7; /* yellow-100 */
+            border-left: 4px solid #f59e0b; /* yellow-600 */
+            color: #92400e; /* yellow-900 */
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 0.5rem;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s, visibility 0s 0.5s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.5s, visibility 0s;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+        .footer-section h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+        .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            .nav a {
+                margin-left: 0;
+            }
+            .btn-large {
+                font-size: 1rem;
+            }
+            .card-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .card-actions button {
+                width: 100%;
+            }
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+
+    </style>
 </head>
 <body>
     <header class="header">
@@ -25,57 +359,115 @@
         </div>
     </header>
 
-    <main class="container" style="padding: 3rem 20px;">
-        <h2 style="margin-bottom: 2rem;">Analyze Job Description</h2>
-        
-        <div class="form-group">
-            <label>Select Tone:</label>
-            <div class="selector-group" id="toneSelector">
-                <button class="selector-btn active" data-tone="snarky">😏 Snarky</button>
-                <button class="selector-btn" data-tone="professional">💼 Professional</button>
-                <button class="selector-btn" data-tone="formal">🎩 Formal</button>
-            </div>
-        </div>
+    <main class="container py-8 sm:py-12">
+        <div class="max-w-4xl mx-auto">
 
-        <div class="form-group">
-            <label>Select AI Persona:</label>
-            <div class="selector-group" id="personaSelector">
-                <button class="selector-btn active" data-persona="brutally-honest">💪 Brutally Honest Coach</button>
-                <button class="selector-btn" data-persona="friendly-mentor">🤝 Friendly Mentor</button>
-                <button class="selector-btn" data-persona="hr-insider">👔 HR Insider</button>
-                <button class="selector-btn" data-persona="corporate-translator">🏢 Corporate Translator</button>
-            </div>
-        </div>
+            <h2 class="text-3xl font-bold mb-8 text-gray-800 text-center">Analyze Your Job Description</h2>
+            
+            <!-- API Key Status and Input -->
+            <div id="statusSection" class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Your Account Status</h3>
+                <div id="loadingStatus" class="flex items-center justify-center py-4">
+                    <div class="spinner !w-6 !h-6 !border-2 !border-primary !border-l-primary-dark"></div>
+                    <span class="ml-3 text-gray-600">Loading user data...</span>
+                </div>
+                
+                <!-- Status Display (Populated by JS) -->
+                <div id="userStatus" class="hidden">
+                    <div class="flex flex-wrap justify-between items-center bg-indigo-50 border border-indigo-200 p-4 rounded-lg mb-4">
+                        <p class="font-medium text-lg text-indigo-800">
+                            Credits Remaining: <span id="creditCount" class="text-2xl font-bold ml-2 text-indigo-600">0</span>
+                        </p>
+                        <p id="proStatusText" class="font-medium text-lg text-red-500">
+                            (Pro Status: Inactive)
+                        </p>
+                    </div>
 
-        <div class="form-group">
-            <label for="jobDescription">Paste Job Description:</label>
-            <textarea 
-                id="jobDescription" 
-                placeholder="Paste the full job description here..."
-                style="min-height: 250px;"
-            ></textarea>
-        </div>
-        
- <!-- AI Disclaimer Notice -->
+                    <div id="apiKeyInputGroup">
+                        <h4 class="font-bold text-gray-700 mb-2">Gemini API Key Setup:</h4>
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+                            <p class="text-sm text-gray-600 mb-2">
+                                To analyze jobs, you need a Gemini API Key. Get yours here:
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark font-medium underline">
+                                    Google AI Studio Key Generator
+                                </a>
+                            </p>
+                            <div class="flex space-x-2">
+                                <input
+                                    type="password"
+                                    id="apiKeyField"
+                                    class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary shadow-sm text-sm"
+                                    placeholder="Paste your Gemini API Key here..."
+                                />
+                                <button
+                                    id="saveApiKeyBtn"
+                                    class="px-4 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150 ease-in-out disabled:opacity-50"
+                                >
+                                    Save Key
+                                </button>
+                            </div>
+                            <p id="apiKeyStatus" class="mt-2 text-sm text-gray-600"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Configuration -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                
+                <div class="form-group mb-6">
+                    <label>Select Tone:</label>
+                    <div class="selector-group" id="toneSelector">
+                        <button class="selector-btn active" data-tone="snarky">😏 Snarky</button>
+                        <button class="selector-btn" data-tone="professional">💼 Professional</button>
+                        <button class="selector-btn" data-tone="formal">🎩 Formal</button>
+                    </div>
+                </div>
+
+                <div class="form-group mb-6">
+                    <label>Select AI Persona:</label>
+                    <div class="selector-group" id="personaSelector">
+                        <button class="selector-btn active" data-persona="brutally-honest">💪 Brutally Honest Coach</button>
+                        <button class="selector-btn" data-persona="friendly-mentor">🤝 Friendly Mentor</button>
+                        <button class="selector-btn" data-persona="hr-insider">👔 HR Insider</button>
+                        <button class="selector-btn" data-persona="corporate-translator">🏢 Corporate Translator</button>
+                    </div>
+                </div>
+
+                <div class="form-group mb-6">
+                    <label for="jobDescription">Paste Job Description:</label>
+                    <textarea 
+                        id="jobDescription" 
+                        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary shadow-inner resize-none font-mono text-sm"
+                        placeholder="Paste the full job description here..."
+                        style="min-height: 250px;"
+                    ></textarea>
+                </div>
+                
+                <!-- AI Disclaimer Notice -->
                 <div class="disclaimer-notice">
                     <strong>⚠️ AI Disclaimer:</strong> The analysis and content are generated by AI and should be used as a helpful guide, not as guaranteed professional advice. Always review and edit generated content before submitting.
                 </div>
-        
-        <button id="analyzeBtn" class="btn-primary btn-large">🔍 DeJargon it!</button>
+                
+                <button id="analyzeBtn" class="btn-primary btn-large" disabled>🔍 DeJargon it! (1 Credit)</button>
+            </div>
 
-        <div id="loadingSpinner" class="spinner" style="display: none;"></div>
 
-        <div id="analysisOutput" style="display: none; margin-top: 2rem;">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Analysis Results</h3>
-                    <div class="card-actions">
-                        <button id="saveAnalysisBtn" class="btn-secondary">💾 Save</button>
-                        <button id="generateResumeBtn" class="btn-primary" title="Pro Feature">🔒 Generate Resume (Pro)</button>
-                        <button id="generateCoverLetterBtn" class="btn-primary" title="Pro Feature">🔒 Cover Letter (Pro)</button>
+            <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+
+            <div id="analysisOutput" style="display: none; margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Analysis Results</h3>
+                        <div class="card-actions">
+                            <button id="saveAnalysisBtn" class="btn-secondary">💾 Save</button>
+                            <button id="generateResumeBtn" class="btn-primary" title="Pro Feature" disabled>🔒 Generate Resume (Pro)</button>
+                            <button id="generateCoverLetterBtn" class="btn-primary" title="Pro Feature" disabled>🔒 Cover Letter (Pro)</button>
+                        </div>
                     </div>
+                    <!-- Analysis Content Displayed Here -->
+                    <div class="card-content text-gray-700" id="analysisContent"></div>
                 </div>
-                <div class="card-content" id="analysisContent" style="white-space: pre-wrap;"></div>
             </div>
         </div>
     </main>
@@ -87,9 +479,9 @@
                 <button class="modal-close" onclick="closeProModal()">&times;</button>
             </div>
             <p id="proModalMessage">Upgrade to Pro for unlimited analyses and more features!</p>
-            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-                <a href="pro-features.html" class="btn-primary">Learn More</a>
-                <button class="btn-secondary" onclick="closeProModal()">Maybe Later</button>
+            <div class="mt-6 flex gap-4">
+                <a href="pro-features.html" class="btn-primary text-center flex-1">Learn More</a>
+                <button class="btn-secondary flex-1" onclick="closeProModal()">Maybe Later</button>
             </div>
         </div>
     </div>
@@ -117,8 +509,8 @@
                 </div>
                 <div class="footer-section">
                     <h4>Company</h4>
-                     <a href="about.html">About Us</a>
-                    </div>
+                    <a href="about.html">About Us</a>
+                </div>
                 <div class="footer-section">
                     <h4>Support</h4>
                     <a href="contact.html">Contact Us</a>
@@ -131,23 +523,376 @@
         </div>
     </footer>
 
-    <script src="js/api.js"></script>
-<script src="js/job-analysis.js"></script>   
-    <script>
-        function toggleFaq(element) {
-            const faqItem = element.parentElement;
-            const isActive = faqItem.classList.contains('active');
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Global Config and Constants ---
+        const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=`;
+        const ANALYSIS_COST = 1; // Credit cost per analysis
+
+        // Global Firebase Variables (will be initialized below)
+        let db;
+        let auth;
+        let userId = null;
+        let currentUserData = { apiKey: null, credits: 0 };
+        let isAuthReady = false;
+
+        // Global Variables provided by the Canvas Environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'job-dejargonator-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const apiKey = ""; // API key for external LLM calls
+
+        // --- DOM Elements ---
+        const $ = (id) => document.getElementById(id);
+        const apiKeyField = $('apiKeyField');
+        const saveApiKeyBtn = $('saveApiKeyBtn');
+        const apiKeyStatus = $('apiKeyStatus');
+        const analyzeBtn = $('analyzeBtn');
+        const jobDescription = $('jobDescription');
+        const loadingSpinner = $('loadingSpinner');
+        const analysisOutput = $('analysisOutput');
+        const analysisContent = $('analysisContent');
+        const creditCount = $('creditCount');
+        const proStatusText = $('proStatusText');
+        const userStatusDiv = $('userStatus');
+        const loadingStatusDiv = $('loadingStatus');
+        const toneSelector = $('toneSelector');
+        const personaSelector = $('personaSelector');
+        const proModal = $('proModal');
+        const proModalMessage = $('proModalMessage');
+
+        // --- Helper Functions ---
+
+        function showToast(message, isError = false) {
+            const toast = $('toast');
+            toast.textContent = message;
+            toast.className = 'toast show';
+            toast.style.backgroundColor = isError ? '#dc2626' : '#10b981';
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        window.closeProModal = () => {
+            proModal.style.display = 'none';
+        };
+
+        function showProModal(message) {
+            proModalMessage.textContent = message;
+            proModal.style.display = 'flex';
+        }
+
+        // --- UI & Selector Logic ---
+
+        function handleSelectorClick(group, target) {
+            group.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            target.classList.add('active');
+        }
+
+        toneSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('selector-btn')) {
+                handleSelectorClick(toneSelector, e.target);
+            }
+        });
+
+        personaSelector.addEventListener('click', (e) => {
+            if (e.target.classList.contains('selector-btn')) {
+                handleSelectorClick(personaSelector, e.target);
+            }
+        });
+
+        function getSelected(group) {
+            return group.querySelector('.selector-btn.active').dataset[group.id.includes('tone') ? 'tone' : 'persona'];
+        }
+
+        function updateUI(data) {
+            currentUserData = data;
+            const hasKey = !!data.apiKey;
+            const hasCredits = data.credits > 0;
+            const canAnalyze = hasKey && hasCredits;
+
+            creditCount.textContent = data.credits;
+            proStatusText.textContent = hasCredits ? '(Pro Status: Active)' : '(Pro Status: Inactive)';
+            proStatusText.classList.toggle('text-green-600', hasCredits);
+            proStatusText.classList.toggle('text-red-500', !hasCredits);
+
+            // Update API Key field and status
+            if (data.apiKey) {
+                apiKeyField.value = '**********'; // Mask the key
+                apiKeyStatus.textContent = '✅ API Key is set.';
+                apiKeyStatus.className = 'mt-2 text-sm text-green-600 font-medium';
+                saveApiKeyBtn.textContent = 'Update Key';
+            } else {
+                apiKeyField.value = '';
+                apiKeyStatus.textContent = '⚠️ Please enter and save your Gemini API Key.';
+                apiKeyStatus.className = 'mt-2 text-sm text-red-500 font-medium';
+                saveApiKeyBtn.textContent = 'Save Key';
+            }
             
-            // Close all FAQ items
-            document.querySelectorAll('.faq-item').forEach(item => {
-                item.classList.remove('active');
+            // Enable/Disable analyze button
+            analyzeBtn.disabled = !canAnalyze;
+            analyzeBtn.title = canAnalyze ? '' : 'Requires API Key and at least 1 credit.';
+        }
+
+        // --- Firebase Initialization and Authentication ---
+
+        window.addEventListener('load', async () => {
+            if (!Object.keys(firebaseConfig).length) {
+                console.error("Firebase config is missing. Cannot initialize Firestore.");
+                loadingStatusDiv.style.display = 'none';
+                userStatusDiv.style.display = 'block';
+                showToast("Error: Firebase is not configured.", true);
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authenticate
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        // Start listening to user data once authenticated
+                        listenToUserData();
+                    } else if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    // Hide loading, show status UI
+                    loadingStatusDiv.style.display = 'none';
+                    userStatusDiv.style.display = 'block';
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                loadingStatusDiv.style.display = 'none';
+                userStatusDiv.style.display = 'block';
+                showToast("Fatal Error: Firebase connection failed.", true);
+            }
+        });
+
+        // --- Firestore Data Listener ---
+
+        function listenToUserData() {
+            if (!db || !userId) return;
+
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'config', 'user-data');
+
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    updateUI({
+                        apiKey: data.apiKey || null,
+                        credits: data.credits || 0,
+                    });
+                } else {
+                    // Create document with initial data if it doesn't exist
+                    setDoc(userDocRef, { apiKey: null, credits: 0 }, { merge: true }).catch(console.error);
+                    updateUI({ apiKey: null, credits: 0 });
+                }
+            }, (error) => {
+                console.error("Error listening to user data:", error);
+                showToast("Error loading user data.", true);
             });
+        }
+
+        // --- API Key Save Handler ---
+        
+        saveApiKeyBtn.addEventListener('click', async () => {
+            if (!isAuthReady) {
+                showToast("Authentication not ready. Please wait.", true);
+                return;
+            }
+
+            const newKey = apiKeyField.value.trim();
+            if (!newKey || newKey === '**********') {
+                showToast("Please paste your full API key.", true);
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'config', 'user-data');
+                await setDoc(userDocRef, { apiKey: newKey }, { merge: true });
+                showToast("API Key saved successfully!");
+                // onSnapshot listener will update the UI
+            } catch (e) {
+                console.error("Error saving API key: ", e);
+                showToast("Error saving key. Check console.", true);
+            }
+        });
+
+
+        // --- Gemini Analysis Logic ---
+
+        async function analyzeJob() {
+            const jobText = jobDescription.value.trim();
+            if (!jobText) {
+                showToast("Please paste a job description first.", true);
+                return;
+            }
+
+            if (!currentUserData.apiKey) {
+                showToast("API Key is required to run analysis.", true);
+                return;
+            }
+
+            if (currentUserData.credits < ANALYSIS_COST) {
+                showProModal(`Analysis costs ${ANALYSIS_COST} credit. You only have ${currentUserData.credits}. Upgrade to Pro for more!`);
+                return;
+            }
+
+            // --- Start Loading UI ---
+            loadingSpinner.style.display = 'block';
+            analysisOutput.style.display = 'none';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = 'Analyzing...';
             
-            // Open clicked item if it wasn't active
-            if (!isActive) {
-                faqItem.classList.add('active');
+            // Get selected options
+            const selectedTone = getSelected(toneSelector);
+            const selectedPersona = getSelected(personaSelector);
+
+            const systemPrompt = `You are a professional job description translator acting as a ${selectedPersona}. Your analysis should be in a ${selectedTone} tone. Your goal is to identify corporate jargon in the provided job description and translate it into clear, plain language. You must provide the output as a JSON object, strictly following the defined schema.`;
+            
+            const prompt = `Analyze the following job description.
+
+            Job Description:
+            ---
+            ${jobText}
+            ---
+            `;
+            
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'config', 'user-data');
+            let initialCredits = currentUserData.credits;
+
+            try {
+                // 1. Optimistic Credit Deduction
+                await setDoc(userDocRef, { credits: initialCredits - ANALYSIS_COST }, { merge: true });
+
+                const fullApiUrl = `${API_URL_BASE}${currentUserData.apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING", description: "A catchy title for the analysis." },
+                                "summary": { "type": "STRING", description: "A professional summary of the job's true nature." },
+                                "breakdown": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "jargon": { "type": "STRING" },
+                                            "plain": { "type": "STRING" },
+                                            "insight": { "type": "STRING" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const runFetch = async (attempt = 0) => {
+                    const maxRetries = 3;
+                    try {
+                        const response = await fetch(fullApiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`API Status ${response.status}: ${response.statusText}`);
+                        }
+
+                        const result = await response.json();
+
+                        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (!jsonText) {
+                            throw new Error("Received empty or invalid response from the AI model.");
+                        }
+
+                        const analysisData = JSON.parse(jsonText);
+                        displayAnalysis(analysisData);
+
+                    } catch (e) {
+                        if (attempt < maxRetries) {
+                            const delay = Math.pow(2, attempt) * 1000;
+                            console.warn(`API call failed, retrying in ${delay / 1000}s...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return runFetch(attempt + 1);
+                        } else {
+                            // Final Failure: Refund credit
+                            await setDoc(userDocRef, { credits: initialCredits }, { merge: true });
+                            console.error("Final API call failed after retries:", e);
+                            throw new Error(`Analysis failed. Credits refunded. Details: ${e.message}`);
+                        }
+                    }
+                };
+
+                await runFetch();
+
+            } catch (e) {
+                console.error("Analysis failed:", e);
+                showToast(e.message, true);
+            } finally {
+                // --- End Loading UI ---
+                loadingSpinner.style.display = 'none';
+                analyzeBtn.disabled = !currentUserData.apiKey || currentUserData.credits < ANALYSIS_COST;
+                analyzeBtn.innerHTML = '🔍 DeJargon it! (1 Credit)';
             }
         }
+
+        analyzeBtn.addEventListener('click', analyzeJob);
+
+        // --- Display Logic ---
+        function displayAnalysis(data) {
+            analysisOutput.style.display = 'block';
+            let html = `
+                <h4 class="text-xl font-bold text-indigo-700 mb-3">${data.title}</h4>
+                <div class="mb-6 p-4 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+                    <p class="font-semibold text-indigo-800 mb-1">Summary:</p>
+                    <p class="text-gray-700 italic">${data.summary}</p>
+                </div>
+                
+                <h5 class="text-lg font-bold text-gray-800 mb-3">Jargon to Plain Speak:</h5>
+                <div class="space-y-4">
+            `;
+
+            data.breakdown.forEach(item => {
+                html += `
+                    <div class="border border-gray-200 p-4 rounded-lg bg-white shadow-sm transition hover:shadow-md">
+                        <p class="text-sm font-medium text-red-600 mb-1">JARGON: <span class="font-mono text-base">${item.jargon}</span></p>
+                        <p class="text-sm font-medium text-green-600 mb-2">MEANING: <span class="text-base font-semibold">${item.plain}</span></p>
+                        <p class="text-xs text-gray-500">INSIGHT: ${item.insight}</p>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            analysisContent.innerHTML = html;
+        }
+
+        // --- Pro Feature Mocking ---
+        function handleProFeature(feature) {
+             showProModal(`The ${feature} feature is exclusive to Pro users. Upgrade now for unlimited access!`);
+        }
+        
+        $('generateResumeBtn').addEventListener('click', () => handleProFeature('Resume Generation'));
+        $('generateCoverLetterBtn').addEventListener('click', () => handleProFeature('Cover Letter Generation'));
+
     </script>
 </body>
 </html>
