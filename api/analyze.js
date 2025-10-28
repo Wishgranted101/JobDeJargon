@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 
         // Get API key from environment variable (safely stored in Vercel)
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-       
+        
         if (!GEMINI_API_KEY) {
             console.error('GEMINI_API_KEY not found in environment');
             return res.status(500).json({ error: 'API key not configured' });
@@ -105,13 +105,13 @@ export default async function handler(req, res) {
 }
 
 /**
- * Build prompt for job analysis - UPDATED VERSION
+ * Build prompt for job analysis - UPDATED VERSION WITH CORRECT PROMPT
  */
 function buildJobAnalysisPrompt(jobDescription, tone, persona) {
     const toneInstructions = {
-        'snarky': 'Be witty, sarcastic, and brutally honest. Point out red flags and unrealistic expectations.',
-        'professional': 'Be balanced, constructive, and professional. Provide objective analysis.',
-        'formal': 'Be formal, structured, and diplomatic. Use professional language throughout.'
+        'snarky': 'Use a witty, sarcastic, and brutally honest tone. Point out red flags and unrealistic expectations.',
+        'professional': 'Use a balanced, constructive, and professional tone. Provide objective analysis.',
+        'formal': 'Use a formal, structured, and diplomatic tone. Use precise and professional language throughout.'
     };
 
     const personaInstructions = {
@@ -121,41 +121,41 @@ function buildJobAnalysisPrompt(jobDescription, tone, persona) {
         'corporate-translator': 'Act as a neutral translator who decodes corporate jargon objectively.'
     };
 
-    return `You are the "Job Dejargonator," an expert career coach and linguistic analyst. Your role is to critically examine corporate jargon in a job description and translate it into clear, actionable sections.
+    const selectedPersona = personaInstructions[persona] || personaInstructions['friendly-mentor'];
+    const selectedTone = toneInstructions[tone] || toneInstructions['professional'];
 
-${personaInstructions[persona] || personaInstructions['friendly-mentor']} ${toneInstructions[tone] || toneInstructions['professional']}
+    return `
+You are the 'Job Dejargonator,' an expert career coach and linguistic analyst. Your core role is to critically examine corporate jargon and translate it into clear, actionable advice.
 
-Your output must strictly follow this format:
+**YOUR INSTRUCTIONS AND PERSONA:**
+${selectedPersona} ${selectedTone}
 
-**What They Really Mean (The Translation):**
+**REQUIRED OUTPUT FORMAT:**
+Your response MUST strictly adhere to this Markdown structure, starting immediately with the first heading. Do NOT include any introduction, conclusion, or conversational text outside of these headings.
+
+## What They Really Mean (The Translation)
 For 5-7 distinct pieces of jargon or vague corporate language found in the job description, provide a short, clear, plain-language translation of what the company is actually looking for in terms of skills, duties, or mindset. Use bullet points.
-
-Format each bullet as:
 - "Jargon phrase from job description" → Plain language translation explaining what they really want
 
-**Action Plan: How to Tailor Your Resume:**
+## Action Plan: How to Tailor Your Resume
 Provide 3-4 specific, concrete, and measurable instructions on how the applicant should rewrite their resume to directly address the translated needs and language of the job description. Focus on using action verbs, quantification, and alignment.
+- Specify which resume section to update (Summary, Skills, Experience) and give concrete examples.
 
-Each instruction should:
-- Specify which resume section to update (Summary, Skills, Experience)
-- Include specific keywords or phrases to add
-- Show how to quantify achievements with numbers/percentages
-- Give concrete examples
-
-**Salary Expectations:**
+## Salary Expectations
 Provide a realistic salary range based on the requirements, seniority level, and market rates.
 Format: $XX,XXX - $XX,XXX with brief justification
 
-**Red Flags:**
+## Red Flags
 List 2-4 warning signs or unrealistic expectations found in the job description. Be specific about what's concerning and why.
 
-**Bottom Line:**
+## Bottom Line
 Should you apply or run? Provide final advice in one paragraph.
 
 ---
 
-Job Description:
+**JOB DESCRIPTION TO ANALYZE:**
 ${jobDescription}
 
-Provide a clear, structured analysis following the format above:`;
+Provide your analysis now, starting with the "What They Really Mean" heading.
+`;
 }
