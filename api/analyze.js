@@ -1,7 +1,75 @@
 /**
- * Build prompt for job analysis - UPDATED VERSION
- * Replace this function in your /api/analyze.js file
+ * Vercel Serverless Function - Job Analysis
+ * File location: /api/analyze.js
  */
+
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    try {
+        const { jobDescription, tone, persona } = req.body;
+
+        if (!jobDescription) {
+            return res.status(400).json({ error: 'Job description is required' });
+        }
+
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+       
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({ error: 'API key not configured' });
+        }
+
+        const prompt = buildJobAnalysisPrompt(jobDescription, tone || 'professional', persona || 'friendly-mentor');
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: tone === 'snarky' ? 0.9 : 0.7,
+                        maxOutputTokens: 2048,
+                    }
+                })
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Gemini API Error:', errorData);
+            return res.status(500).json({
+                error: 'Failed to analyze job',
+                details: errorData
+            });
+        }
+
+        const data = await response.json();
+        const analysis = data.candidates[0].content.parts[0].text;
+
+        return res.status(200).json({
+            success: true,
+            analysis: analysis
+        });
+
+    } catch (error) {
+        console.error('Server error:', error);
+        return res.status(500).json({
+            error: 'Internal server error',
+            message: error.message
+        });
+    }
+}
+
 function buildJobAnalysisPrompt(jobDescription, tone, persona) {
     const toneInstructions = {
         'snarky': 'Be witty, sarcastic, and brutally honest. Point out red flags and unrealistic expectations.',
@@ -26,7 +94,7 @@ Your output must strictly follow this format:
 For 5-7 distinct pieces of jargon or vague corporate language found in the job description, provide a short, clear, plain-language translation of what the company is actually looking for in terms of skills, duties, or mindset. Use bullet points.
 
 Format each bullet as:
-• "Jargon phrase from job description" → Plain language translation explaining what they really want
+- "Jargon phrase from job description" → Plain language translation explaining what they really want
 
 **Action Plan: How to Tailor Your Resume:**
 Provide 3-4 specific, concrete, and measurable instructions on how the applicant should rewrite their resume to directly address the translated needs and language of the job description. Focus on using action verbs, quantification, and alignment.
