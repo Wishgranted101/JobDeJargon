@@ -5,6 +5,13 @@
  * File location: /api/analyze.js
  */
 
+// ** NEW CONSTANT: System Instruction for the Model **
+// This separate instruction ensures the model always adheres to the strict formatting rules
+// and avoids conversational filler outside the required sections.
+const SYSTEM_INSTRUCTION = `
+You are the 'Job Dejargonator,' an expert career coach and linguistic analyst. Your only task is to analyze the provided job description and output your analysis STRICTLY in the required Markdown format. Do not use any introductory conversational text (e.g., "Here is your analysis...") or concluding conversational text. Start directly with the '## What They Really Mean (The Translation)' heading and follow the requested format exactly.
+`;
+
 export default async function handler(req, res) {
     // Only allow POST requests
     if (req.method !== 'POST') {
@@ -36,8 +43,8 @@ export default async function handler(req, res) {
 
         console.log('API key found, building prompt...');
 
-        // Build the prompt
-        const prompt = buildJobAnalysisPrompt(jobDescription, tone || 'professional', persona || 'friendly-mentor');
+        // Build the prompt (User Query)
+        const userQuery = buildJobAnalysisPrompt(jobDescription, tone || 'professional', persona || 'friendly-mentor');
 
         console.log('Calling Gemini API...');
 
@@ -50,11 +57,15 @@ export default async function handler(req, res) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    // ** UPDATED PAYLOAD: Separating System Instruction and User Query **
                     contents: [{
                         parts: [{
-                            text: prompt
+                            text: userQuery
                         }]
                     }],
+                    config: {
+                         systemInstruction: SYSTEM_INSTRUCTION
+                    },
                     generationConfig: {
                         temperature: tone === 'snarky' ? 0.9 : 0.7,
                         maxOutputTokens: 2048,
@@ -76,13 +87,13 @@ export default async function handler(req, res) {
         }
 
         const data = await response.json();
-        console.log('Gemini response received, has candidates:', !!data.candidates);
-
-        if (!data.candidates || !data.candidates[0]) {
-            console.error('No candidates in response:', JSON.stringify(data));
+        
+        // ** MORE ROBUST CHECKING for candidates array (Addresses potential 'undefined' errors) **
+        if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content || !data.candidates[0].content.parts || data.candidates[0].content.parts.length === 0) {
+            console.error('No valid content found in response:', JSON.stringify(data));
             return res.status(500).json({ 
                 error: 'Unexpected response from AI',
-                details: 'No analysis generated' 
+                details: 'No analysis generated or content structure was invalid.' 
             });
         }
 
@@ -125,13 +136,11 @@ function buildJobAnalysisPrompt(jobDescription, tone, persona) {
     const selectedTone = toneInstructions[tone] || toneInstructions['professional'];
 
     return `
-You are the 'Job Dejargonator,' an expert career coach and linguistic analyst. Your core role is to critically examine corporate jargon and translate it into clear, actionable advice.
-
-**YOUR INSTRUCTIONS AND PERSONA:**
+**Instructions & Persona (To be merged with System Instruction):**
 ${selectedPersona} ${selectedTone}
 
 **REQUIRED OUTPUT FORMAT:**
-Your response MUST strictly adhere to this Markdown structure, starting immediately with the first heading. Do NOT include any introduction, conclusion, or conversational text outside of these headings.
+Your response MUST strictly adhere to this Markdown structure, starting immediately with the first heading.
 
 ## What They Really Mean (The Translation)
 For 5-7 distinct pieces of jargon or vague corporate language found in the job description, provide a short, clear, plain-language translation of what the company is actually looking for in terms of skills, duties, or mindset. Use bullet points.
