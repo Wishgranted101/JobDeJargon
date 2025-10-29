@@ -101,14 +101,29 @@
             const result = await signUp(email, password, name);
             
             if (result.success) {
-                showToast(result.message || 'Account created! Redirecting...');
+                showToast(result.message || 'Account created! Loading your profile...');
+                
+                // Wait for profile to be created by database trigger
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Manually load the profile
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        await loadUserProfile(user.id);
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                }
+                
+                showToast('Redirecting...');
                 
                 setTimeout(() => {
                     // Check if there's a redirect destination
                     const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'job-analysis.html';
                     sessionStorage.removeItem('redirectAfterLogin');
                     window.location.href = redirectTo;
-                }, 2000);
+                }, 1000);
             } else {
                 showToast(result.message || 'Signup failed. Please try again.');
                 submitBtn.disabled = false;
