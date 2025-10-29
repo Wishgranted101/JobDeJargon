@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - JobDeJargon Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <span id="userInfo" style="display: none;">
+                        <span id="creditDisplay" style="margin-right: 1rem; color: var(--primary); font-weight: 600;"></span>
+                        <button onclick="logout()" class="btn-secondary">Logout</button>
+                    </span>
+                    <span id="guestInfo">
+                        <a href="login.html" class="btn-secondary">Login</a>
+                        <a href="signup.html" class="btn-primary">Sign Up</a>
+                    </span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 20px;">
+        <h2 style="text-align: center; margin-bottom: 1rem;">Simple, Pay-As-You-Go Pricing</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Start free, buy credits when you need them, or subscribe for unlimited access.
+        </p>
+
+        <div class="pricing-grid">
+            <!-- Free Tier -->
+            <div class="pricing-card">
+                <h4>Free</h4>
+                <div class="price">$0<span>/day</span></div>
+                <ul class="pricing-features">
+                    <li>✅ 1 job analysis per day</li>
+                    <li>✅ All AI tones & personas</li>
+                    <li>✅ Save your analyses</li>
+                    <li>✅ View analysis history</li>
+                    <li>❌ Resume generator</li>
+                    <li>❌ Cover letter generator</li>
+                    <li>❌ Export to PDF</li>
+                </ul>
+                <a href="signup.html" class="btn-secondary" style="width: 100%;">Sign Up Free</a>
+            </div>
+
+            <!-- Starter Pack -->
+            <div class="pricing-card">
+                <h4>Starter Pack</h4>
+                <div class="price">$4.99</div>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0 1.5rem;">10 analyses ($0.50 each)</p>
+                <ul class="pricing-features">
+                    <li>✅ Everything in Free</li>
+                    <li>✅ 10 job analyses</li>
+                    <li>✅ No expiration</li>
+                    <li>✅ Use anytime</li>
+                    <li>❌ Resume generator</li>
+                    <li>❌ Cover letter generator</li>
+                    <li>❌ Export to PDF</li>
+                </ul>
+                <button class="btn-secondary" disabled style="width: 100%; cursor: not-allowed;" title="Coming soon!">
+                    🔒 Coming Soon
+                </button>
+                <p style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                    Payment processing launching this week!
+                </p>
+            </div>
+
+            <!-- Value Pack -->
+            <div class="pricing-card featured">
+                <div class="badge">Best Value</div>
+                <h4>Value Pack</h4>
+                <div class="price">$9.99</div>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0 1.5rem;">25 analyses ($0.40 each - Save 20%!)</p>
+                <ul class="pricing-features">
+                    <li>✅ Everything in Free</li>
+                    <li>✅ 25 job analyses</li>
+                    <li>✅ No expiration</li>
+                    <li>✅ Best price per analysis</li>
+                    <li>❌ Resume generator</li>
+                    <li>❌ Cover letter generator</li>
+                    <li>❌ Export to PDF</li>
+                </ul>
+                <button class="btn-primary" disabled style="width: 100%; cursor: not-allowed;" title="Coming soon!">
+                    🔒 Coming Soon
+                </button>
+                <p style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                    Payment processing launching this week!
+                </p>
+            </div>
+
+            <!-- Pro Subscription -->
+            <div class="pricing-card" style="border: 2px solid var(--primary); position: relative;">
+                <div class="badge" style="background: var(--warning);">Coming Soon</div>
+                <h4>Pro Subscription</h4>
+                <div class="price">$19.99<span>/month</span></div>
+                <ul class="pricing-features" style="margin: 1.5rem 0;">
+                    <li>✅ <strong>Unlimited</strong> job analyses</li>
+                    <li>✅ AI Resume Generator 🔥</li>
+                    <li>✅ AI Cover Letter Generator 🔥</li>
+                    <li>✅ Export to PDF</li>
+                    <li>✅ Company insights</li>
+                    <li>✅ Priority support</li>
+                    <li>✅ Early access to new features</li>
+                </ul>
+                <button onclick="joinProWaitlist()" class="btn-primary" style="width: 100%;">
+                    Join Waitlist - Get 50% Off Launch
+                </button>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div style="max-width: 800px; margin: 4rem auto 0;">
+            <h3 style="text-align: center; margin-bottom: 2rem;">Frequently Asked Questions</h3>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How does the free tier work?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Sign up for free and get 1 job analysis per day. This resets every 24 hours. You can use all AI tones (Snarky, Professional, Formal) and all personas (Brutally Honest Coach, Friendly Mentor, HR Insider, Corporate Translator).</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Do credits expire?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>No! Credits never expire. Buy them once and use them whenever you need. Perfect for active job seekers who want to analyze multiple positions in one sitting.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>What's the difference between credit packs and Pro?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Credit packs</strong> are perfect for casual job seekers who want to analyze a few jobs. <strong>Pro subscription</strong> is for power users who want unlimited analyses plus exclusive features like AI resume and cover letter generation.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Can I cancel my Pro subscription anytime?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Absolutely! Cancel anytime from your dashboard. No questions asked, no fees. You'll keep Pro access until the end of your billing period.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>When will Pro features be available?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>We're launching Pro features gradually based on demand! Join the waitlist to get 50% off the first month when we launch. We'll email you as soon as it's available.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pro Waitlist Modal -->
+    <div id="proWaitlistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Join the Pro Waitlist</h3>
+                <button class="modal-close" onclick="closeProWaitlistModal()">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Be the first to know when Pro features launch and get <strong>50% off your first month!</strong>
+            </p>
+            <form id="proWaitlistForm">
+                <div class="form-group">
+                    <input type="email" id="waitlistEmail" required placeholder="your@email.com">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    Join Waitlist
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JobDeJargon Pro</h4>
+                    <p>The honest co-pilot for job seekers.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="terms-of-service.html">Terms of Service</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="refund-policy.html">Refund Policy</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <a href="about.html">About Us</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="contact.html">Contact Us</a>
+                    <a href="index.html#faq">FAQ</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 JobDeJargon Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    
+    <script>
+        // Update auth UI
+        setTimeout(() => {
+            if (typeof isUserLoggedIn === 'function') {
+                const userInfo = document.getElementById('userInfo');
+                const guestInfo = document.getElementById('guestInfo');
+                const creditDisplay = document.getElementById('creditDisplay');
+                
+                if (isUserLoggedIn()) {
+                    if (userInfo) {
+                        userInfo.style.display = 'flex';
+                        userInfo.style.alignItems = 'center';
+                        userInfo.style.gap = '1rem';
+                    }
+                    if (guestInfo) guestInfo.style.display = 'none';
+                    
+                    if (creditDisplay && window.currentUser) {
+                        const credits = window.currentUser.credits || 0;
+                        creditDisplay.textContent = `💳 ${credits} credit${credits === 1 ? '' : 's'}`;
+                    }
+                } else {
+                    if (userInfo) userInfo.style.display = 'none';
+                    if (guestInfo) {
+                        guestInfo.style.display = 'flex';
+                        guestInfo.style.alignItems = 'center';
+                        guestInfo.style.gap = '1rem';
+                    }
+                }
+            }
+        }, 1500);
+        
+        function joinProWaitlist() {
+            document.getElementById('proWaitlistModal').classList.add('active');
+        }
+        
+        function closeProWaitlistModal() {
+            document.getElementById('proWaitlistModal').classList.remove('active');
+        }
+        
+        document.getElementById('proWaitlistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('waitlistEmail').value.trim();
+            
+            try {
+                // Save to Supabase
+                const { error } = await supabase
+                    .from('pro_waitlist')
+                    .insert([{ email: email }]);
+                
+                if (error) {
+                    // Check if already on waitlist
+                    if (error.code === '23505') {
+                        showToast('You\'re already on the waitlist!');
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    showToast('✅ You\'re on the list! We\'ll email you when Pro launches with 50% off.');
+                }
+                
+                closeProWaitlistModal();
+            } catch (error) {
+                console.error('Error joining waitlist:', error);
+                showToast('Error joining waitlist. Please try again.');
+            }
+        });
+        
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
