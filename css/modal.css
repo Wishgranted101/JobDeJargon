@@ -1,0 +1,351 @@
+/**
+ * Full-Screen Modal Styling for Resume & Cover Letter Generator
+ * File: css/modal.css
+ */
+
+/* Full-screen modal overlay */
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal container */
+.fullscreen-modal-container {
+    background: var(--background);
+    width: 95%;
+    height: 95%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal header */
+.fullscreen-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.fullscreen-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fullscreen-modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s, transform 0.2s;
+    padding: 0.25rem;
+    line-height: 1;
+}
+
+.fullscreen-modal-close:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+/* Modal body */
+.fullscreen-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+/* Step container */
+.modal-step {
+    display: none;
+}
+
+.modal-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Step 1: Input form */
+.modal-input-section {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.modal-input-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.modal-input-section textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.modal-input-section textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.modal-tip {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-left: 4px solid var(--primary);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Step 2: Split view (Generated content + Reference) */
+.modal-split-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    height: 100%;
+}
+
+.modal-content-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content-panel h4 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-editable-content {
+    flex: 1;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-height: 400px;
+}
+
+.modal-editable-content:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.modal-reference-content {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+.modal-reference-content h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-reference-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.modal-reference-content li {
+    padding: 0.25rem 0;
+}
+
+/* Modal footer */
+.fullscreen-modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.modal-footer-left,
+.modal-footer-right {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Loading state */
+.modal-loading {
+    display: none;
+    text-align: center;
+    padding: 3rem;
+}
+
+.modal-loading.active {
+    display: block;
+}
+
+.modal-loading-spinner {
+    border: 4px solid var(--border);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+
+.modal-loading-text {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 1024px) {
+    .modal-split-view {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .fullscreen-modal-container {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .fullscreen-modal-header {
+        padding: 1rem;
+    }
+    
+    .fullscreen-modal-title {
+        font-size: 1.2rem;
+    }
+    
+    .fullscreen-modal-body {
+        padding: 1rem;
+    }
+    
+    .fullscreen-modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+    }
+    
+    .modal-footer-left,
+    .modal-footer-right {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .modal-input-section textarea {
+        min-height: 200px;
+    }
+}
+
+/* Tab view for mobile */
+.modal-tabs {
+    display: none;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+.modal-tab {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.modal-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+    .modal-tabs {
+        display: flex;
+        gap: 0;
+    }
+    
+    .modal-tab {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .modal-content-panel {
+        display: none;
+    }
+    
+    .modal-content-panel.active {
+        display: flex;
+    }
+}
