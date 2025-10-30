@@ -243,7 +243,7 @@ function setupActionButtons() {
         });
     }
     
-    // Generate Resume (Pro feature - locked)
+    // Generate Resume (Pro feature - connected to modal)
     const resumeBtn = document.getElementById('generateResumeBtn');
     if (resumeBtn) {
         resumeBtn.addEventListener('click', () => {
@@ -252,11 +252,12 @@ function setupActionButtons() {
                 return;
             }
             
-            showProModal('Resume Generator is a Pro feature! Upgrade to create AI-tailored resumes that match any job description perfectly.');
+            // Open full-screen resume generator modal
+            openResumeGenerator();
         });
     }
     
-    // Generate Cover Letter (Pro feature - locked)
+    // Generate Cover Letter (Pro feature - connected to modal)
     const coverLetterBtn = document.getElementById('generateCoverLetterBtn');
     if (coverLetterBtn) {
         coverLetterBtn.addEventListener('click', () => {
@@ -265,7 +266,8 @@ function setupActionButtons() {
                 return;
             }
             
-            showProModal('Cover Letter Generator is a Pro feature! Upgrade to create personalized cover letters that highlight your relevant experience.');
+            // Open full-screen cover letter generator modal
+            openCoverLetterGenerator();
         });
     }
 }
