@@ -239,14 +239,28 @@
         </div>
 
         <!-- Pricing CTA -->
-<!-- Simple CTA -->
+<!-- Waitlist CTA -->
 <div style="max-width: 600px; margin: 3rem auto; text-align: center;">
-    <h3 style="margin-bottom: 1rem;">Ready to Get Started?</h3>
+    <h3 style="margin-bottom: 1rem;">Want Early Access to Pro?</h3>
     <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-        Choose the plan that works for you
+        Be the first to unlock unlimited analyses when Pro launches.<br>
+        <strong>Waitlist members get 50% off</strong> their first month!
     </p>
-    <a href="pricing.html" class="btn-primary btn-large">View All Pricing</a>
+    
+    <form id="proWaitlistFormBottom" onsubmit="handleWaitlistSignup(event, 'bottom')" 
+          style="max-width: 400px; margin: 0 auto;">
+        <input type="email" id="waitlistEmailBottom" placeholder="your@email.com" required 
+               style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;">
+        <button type="submit" class="btn-primary btn-large" style="width: 100%;">
+            Join Waitlist - Get 50% Off
+        </button>
+    </form>
+    
+    <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+        Not ready for unlimited? <a href="pricing.html" style="color: var(--primary);">View credit packs</a>
+    </p>
 </div>
+        
     </main>
 
     <footer class="footer">
