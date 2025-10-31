@@ -1,11 +1,14 @@
 /**
  * API.js - Credit System + Daily Free Analysis
+ * Updated for simplified personality system
  */
 
 /**
  * Fetch job analysis with credit/daily free checking
+ * @param {string} jobDescription - The job description text
+ * @param {string} personality - Combined personality (brutal-truth, hr-insider, friendly-mentor)
  */
-async function fetchJobAnalysis(jobDescription, tone = 'professional', persona = 'friendly-mentor') {
+async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
     // Check if user can analyze
     const canAnalyze = await canUserAnalyze();
     
@@ -22,7 +25,7 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
     try {
         showSpinner();
         
-        // Call serverless function
+        // Call serverless function with new personality parameter
         const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: {
@@ -30,8 +33,7 @@ async function fetchJobAnalysis(jobDescription, tone = 'professional', persona =
             },
             body: JSON.stringify({
                 jobDescription,
-                tone,
-                persona
+                personality  // Send combined personality instead of separate tone/persona
             })
         });
 
@@ -118,92 +120,7 @@ If they dodge these questions or give vague answers, RUN. There are better oppor
 
 ---
 
-**💡 This is a DEMO analysis.** Sign up free to analyze YOUR job descriptions with your choice of AI tone and persona!`;
+**💡 This is a DEMO analysis.** Sign up free to analyze YOUR job descriptions with your choice of AI advisor!`;
 }
 
-/**
- * Show modals
- */
-function showAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.classList.add('active');
-    }
-}
-
-function closeAuthModal() {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-function showBuyCreditsModal(customMessage = null) {
-    const modal = document.getElementById('buyCreditsModal');
-    const message = document.getElementById('buyCreditsMessage');
-    
-    if (modal) {
-        if (customMessage && message) {
-            message.textContent = customMessage;
-        } else if (message) {
-            // Default message based on situation
-            const today = new Date().toISOString().split('T')[0];
-            const lastFree = window.currentUser?.last_free_analysis_date;
-            
-            if (lastFree === today) {
-                message.textContent = "You've used your free analysis for today! Buy credits to continue analyzing, or come back tomorrow.";
-            } else {
-                message.textContent = "You're out of credits! Buy more to keep analyzing job descriptions.";
-            }
-        }
-        modal.classList.add('active');
-    }
-}
-
-function closeBuyCreditsModal() {
-    const modal = document.getElementById('buyCreditsModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-function showProModal(message) {
-    const modal = document.getElementById('proModal');
-    const modalMessage = document.getElementById('proModalMessage');
-    if (modal && modalMessage) {
-        modalMessage.textContent = message;
-        modal.classList.add('active');
-    }
-}
-
-function closeProModal() {
-    const modal = document.getElementById('proModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-function showSpinner() {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) {
-        spinner.style.display = 'block';
-    }
-}
-
-function hideSpinner() {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) {
-        spinner.style.display = 'none';
-    }
-}
-
-function showToast(message, duration = 3000) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.textContent = message;
-        toast.classList.add('active');
-        setTimeout(() => {
-            toast.classList.remove('active');
-        }, duration);
-    }
-}
+// ... rest of your existing api.js functions (modals, spinners, etc.) ...
