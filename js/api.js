@@ -1,6 +1,7 @@
-/**
+**
  * API.js - Credit System + Daily Free Analysis
  * Updated for simplified personality system
+ * COMPLETE VERSION with all helper functions
  */
 
 /**
@@ -123,4 +124,89 @@ If they dodge these questions or give vague answers, RUN. There are better oppor
 **💡 This is a DEMO analysis.** Sign up free to analyze YOUR job descriptions with your choice of AI advisor!`;
 }
 
-// ... rest of your existing api.js functions (modals, spinners, etc.) ...
+/**
+ * Show modals
+ */
+function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function showBuyCreditsModal(customMessage = null) {
+    const modal = document.getElementById('buyCreditsModal');
+    const message = document.getElementById('buyCreditsMessage');
+    
+    if (modal) {
+        if (customMessage && message) {
+            message.textContent = customMessage;
+        } else if (message) {
+            // Default message based on situation
+            const today = new Date().toISOString().split('T')[0];
+            const lastFree = window.currentUser?.last_free_analysis_date;
+            
+            if (lastFree === today) {
+                message.textContent = "You've used your free analysis for today! Buy credits to continue analyzing, or come back tomorrow.";
+            } else {
+                message.textContent = "You're out of credits! Buy more to keep analyzing job descriptions.";
+            }
+        }
+        modal.classList.add('active');
+    }
+}
+
+function closeBuyCreditsModal() {
+    const modal = document.getElementById('buyCreditsModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function showProModal(message) {
+    const modal = document.getElementById('proModal');
+    const modalMessage = document.getElementById('proModalMessage');
+    if (modal && modalMessage) {
+        modalMessage.textContent = message;
+        modal.classList.add('active');
+    }
+}
+
+function closeProModal() {
+    const modal = document.getElementById('proModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function showSpinner() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) {
+        spinner.style.display = 'block';
+    }
+}
+
+function hideSpinner() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
+}
+
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('active');
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, duration);
+    }
+}
