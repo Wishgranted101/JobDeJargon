@@ -32,7 +32,7 @@
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <input type="password" id="password" required placeholder="••••••••" minlength="6">
             </div>
             
             <div style="text-align: right; margin-bottom: 1rem;">
@@ -80,6 +80,22 @@
     <script src="js/api.js"></script>
     
     <script>
+        // Wait for Supabase to load
+        function waitForSupabase(callback, maxAttempts = 20) {
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (typeof supabase !== 'undefined' && supabase) {
+                    clearInterval(checkInterval);
+                    callback();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('❌ Supabase failed to load');
+                    showToast('Error loading authentication. Please refresh the page.');
+                }
+            }, 100);
+        }
+
         // Login form
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -88,27 +104,48 @@
             const password = document.getElementById('password').value;
             const submitBtn = document.getElementById('loginBtn');
             
+            // Validate inputs
+            if (!email || !password) {
+                showToast('Please enter both email and password');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters');
+                return;
+            }
+            
             // Disable button
             submitBtn.disabled = true;
             submitBtn.textContent = 'Logging in...';
             
-            // Login
-            const result = await login(email, password);
-            
-            if (result.success) {
-                showToast('Login successful! Redirecting...');
-                
-                setTimeout(() => {
-                    // Check if there's a redirect destination
-                    const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'job-analysis.html';
-                    sessionStorage.removeItem('redirectAfterLogin');
-                    window.location.href = redirectTo;
-                }, 1000);
-            } else {
-                showToast(result.message || 'Login failed. Please check your credentials.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
-            }
+            // Wait for Supabase to be ready
+            waitForSupabase(async () => {
+                try {
+                    // Login
+                    const result = await login(email, password);
+                    
+                    if (result.success) {
+                        showToast('Login successful! Redirecting...');
+                        
+                        setTimeout(() => {
+                            // Check if there's a redirect destination
+                            const redirectTo = sessionStorage.getItem('redirectAfterLogin') || 'job-analysis.html';
+                            sessionStorage.removeItem('redirectAfterLogin');
+                            window.location.href = redirectTo;
+                        }, 1000);
+                    } else {
+                        showToast(result.message || 'Login failed. Please check your credentials.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Login';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showToast('Login error: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                }
+            });
         });
         
         // Forgot password link
@@ -122,14 +159,17 @@
             e.preventDefault();
             
             const email = document.getElementById('resetEmail').value.trim();
-            const result = await resetPassword(email);
             
-            if (result.success) {
-                showToast(result.message);
-                closeForgotPasswordModal();
-            } else {
-                showToast(result.message || 'Error sending reset email');
-            }
+            waitForSupabase(async () => {
+                const result = await resetPassword(email);
+                
+                if (result.success) {
+                    showToast(result.message);
+                    closeForgotPasswordModal();
+                } else {
+                    showToast(result.message || 'Error sending reset email');
+                }
+            });
         });
         
         function closeForgotPasswordModal() {
