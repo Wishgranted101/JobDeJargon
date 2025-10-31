@@ -1,14 +1,8 @@
-**
- * API.js - Credit System + Daily Free Analysis
- * Updated for simplified personality system
- * COMPLETE VERSION with all helper functions
- */
+// API.js - Credit System + Daily Free Analysis
+// Updated for simplified personality system
+// COMPLETE VERSION with all helper functions
 
-/**
- * Fetch job analysis with credit/daily free checking
- * @param {string} jobDescription - The job description text
- * @param {string} personality - Combined personality (brutal-truth, hr-insider, friendly-mentor)
- */
+// Fetch job analysis with credit/daily free checking
 async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
     // Check if user can analyze
     const canAnalyze = await canUserAnalyze();
@@ -34,7 +28,7 @@ async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
             },
             body: JSON.stringify({
                 jobDescription,
-                personality  // Send combined personality instead of separate tone/persona
+                personality
             })
         });
 
@@ -61,9 +55,7 @@ async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
     }
 }
 
-/**
- * Get demo analysis (no authentication required)
- */
+// Get demo analysis (no authentication required)
 function getDemoAnalysis() {
     return `## What They Really Mean (The Translation):
 
@@ -124,9 +116,7 @@ If they dodge these questions or give vague answers, RUN. There are better oppor
 **💡 This is a DEMO analysis.** Sign up free to analyze YOUR job descriptions with your choice of AI advisor!`;
 }
 
-/**
- * Show modals
- */
+// Show modals
 function showAuthModal() {
     const modal = document.getElementById('authModal');
     if (modal) {
