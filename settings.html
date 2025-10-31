@@ -37,6 +37,7 @@
                     <a href="job-analysis.html">Analyze Job</a>
                     <a href="dashboard.html">Dashboard</a>
                     <a href="settings.html">Settings</a>
+                    <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">Logout</button>
                 </nav>
             </div>
         </div>
@@ -62,11 +63,11 @@
                         <form id="profileForm">
                             <div class="form-group">
                                 <label for="fullName">Full Name</label>
-                                <input type="text" id="fullName" value="John Doe">
+                                <input type="text" id="fullName" placeholder="Your name">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" value="john.doe@email.com" disabled>
+                                <input type="email" id="email" disabled>
                                 <small style="color: var(--text-secondary);">Contact support to change email</small>
                             </div>
                             <div class="form-group">
@@ -95,21 +96,13 @@
                         <div style="padding: 1.5rem; background: var(--surface); border-radius: 8px; margin-bottom: 1.5rem;">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                                 <div>
-                                    <h4 id="currentPlan">Free Plan</h4>
-                                    <p style="color: var(--text-secondary); margin-top: 0.25rem;">Limited features</p>
+                                    <h4>Free Plan</h4>
+                                    <p style="color: var(--text-secondary); margin-top: 0.25rem;" id="creditsDisplay">Loading credits...</p>
                                 </div>
                                 <div>
                                     <a href="pro-features.html" class="btn-primary">Upgrade to Pro</a>
                                 </div>
                             </div>
-                        </div>
-                        <div id="proSubscription" style="display: none;">
-                            <h4 style="margin-bottom: 1rem;">Pro Subscription</h4>
-                            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                                Your Pro subscription is active and will renew on <strong>January 1, 2026</strong>
-                            </p>
-                            <button class="btn-secondary">Manage Billing</button>
-                            <button class="btn-danger" style="margin-left: 0.5rem;">Cancel Subscription</button>
                         </div>
                     </div>
                 </div>
@@ -118,23 +111,15 @@
                     <div class="card">
                         <h3 style="margin-bottom: 1.5rem;">Preferences</h3>
                         <div class="form-group">
-                            <label>Default Tone</label>
-                            <select id="defaultTone">
-                                <option value="snarky">Snarky</option>
-                                <option value="professional" selected>Professional</option>
-                                <option value="formal">Formal</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Default Persona</label>
-                            <select id="defaultPersona">
-                                <option value="brutally-honest" selected>Brutally Honest Coach</option>
-                                <option value="friendly-mentor">Friendly Mentor</option>
+                            <label>Default Personality</label>
+                            <select id="defaultPersonality">
+                                <option value="brutal-truth" selected>Brutal Truth Coach</option>
                                 <option value="hr-insider">HR Insider</option>
-                                <option value="corporate-translator">Corporate Translator</option>
+                                <option value="friendly-mentor">Friendly Mentor</option>
                             </select>
+                            <small style="color: var(--text-secondary);">Choose your preferred AI advisor style</small>
                         </div>
-                        <button class="btn-primary">Save Preferences</button>
+                        <button class="btn-primary" onclick="savePreferences()">Save Preferences</button>
                     </div>
                 </div>
 
@@ -175,8 +160,40 @@
         </div>
     </footer>
 
+    <!-- CRITICAL: Load Supabase and Auth BEFORE api.js -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
+    
     <script>
+        // ⚠️ AUTHENTICATION GUARD - Redirect if not logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for Supabase to initialize
+            setTimeout(() => {
+                if (!isUserLoggedIn()) {
+                    showToast('Please log in to access settings');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                } else {
+                    // Load user data
+                    loadUserSettings();
+                }
+            }, 500);
+        });
+        
+        // Load user settings
+        function loadUserSettings() {
+            if (window.currentUser) {
+                document.getElementById('email').value = window.currentUser.email || '';
+                document.getElementById('fullName').value = window.currentUser.full_name || '';
+                
+                // Show credits
+                const creditsText = `${window.currentUser.credits} credits remaining`;
+                document.getElementById('creditsDisplay').textContent = creditsText;
+            }
+        }
+        
         function showSection(sectionName) {
             document.querySelectorAll('.settings-section').forEach(section => section.style.display = 'none');
             document.querySelectorAll('.settings-link').forEach(link => link.classList.remove('active'));
@@ -198,6 +215,12 @@
             showToast('Profile updated successfully!');
         });
         
+        function savePreferences() {
+            const personality = document.getElementById('defaultPersonality').value;
+            localStorage.setItem('defaultPersonality', personality);
+            showToast('Preferences saved!');
+        }
+        
         function clearHistory() {
             if (confirm('Are you sure you want to clear all your job history?')) {
                 localStorage.removeItem('savedJobs');
@@ -210,15 +233,13 @@
         function deleteAccount() {
             const confirmation = prompt('Type "DELETE" to confirm account deletion:');
             if (confirmation === 'DELETE') {
+                // In production, this would call a Supabase function
                 localStorage.clear();
                 showToast('Account deleted. Redirecting...');
-                setTimeout(() => window.location.href = 'index.html', 2000);
+                setTimeout(() => {
+                    logout();
+                }, 2000);
             }
-        }
-        
-        if (isProUser && typeof isProUser === 'function' && isProUser()) {
-            document.getElementById('currentPlan').textContent = 'Pro Plan';
-            document.getElementById('proSubscription').style.display = 'block';
         }
     </script>
 </body>
