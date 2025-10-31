@@ -13,30 +13,32 @@ You are the 'Job Dejargonator,' an expert career coach and linguistic analyst. Y
 `;
 
 /**
+ * Personality definitions (combined tone + persona)
+ */
+const PERSONALITIES = {
+    'brutal-truth': {
+        instruction: 'You are "The Brutal Truth" - a witty, sarcastic, and brutally honest career coach. Point out red flags and unrealistic expectations without sugarcoating. Use direct, sometimes edgy language to help job seekers see through corporate BS.',
+        temperature: 0.9
+    },
+    'hr-insider': {
+        instruction: 'You are "The HR Insider" - a diplomatic, objective career advisor with insider knowledge of hiring practices. Use formal, professional language. Provide strategic insights from the corporate perspective while remaining neutral and helpful.',
+        temperature: 0.7
+    },
+    'friendly-mentor': {
+        instruction: 'You are "The Friendly Mentor" - a supportive, constructive, and encouraging career advisor. Use a balanced, professional tone while remaining warm and accessible. Provide actionable advice with empathy.',
+        temperature: 0.7
+    }
+};
+
+/**
  * Builds the dynamic prompt based on user selections
  */
-function getDynamicPrompt(jobDescription, tone, persona) {
-    const toneInstructions = {
-        'snarky': 'Use a witty, sarcastic, and brutally honest tone. Point out red flags and unrealistic expectations.',
-        'professional': 'Use a balanced, constructive, and professional tone. Provide objective analysis.',
-        'formal': 'Use a formal, structured, and diplomatic tone. Use precise and professional language throughout.'
-    };
-
-    const personaInstructions = {
-        'brutally-honest': 'Act as a no-nonsense career coach who tells it like it is.',
-        'friendly-mentor': 'Act as a supportive mentor who provides encouraging guidance.',
-        'hr-insider': 'Act as an HR professional with insider knowledge of hiring practices.',
-        'corporate-translator': 'Act as a neutral translator who decodes corporate jargon.'
-    };
-    
-    // Fallback in case selections are missing
-    const selectedTone = tone || 'professional';
-    const selectedPersona = persona || 'friendly-mentor';
+function getDynamicPrompt(jobDescription, personality) {
+    // Get personality config, default to brutal-truth if not specified
+    const selectedPersonality = PERSONALITIES[personality] || PERSONALITIES['brutal-truth'];
 
     return `
-Analyze the following job description. Apply the following instructions to guide your output:
-- **Tone:** ${toneInstructions[selectedTone] || toneInstructions['professional']}
-- **Persona:** ${personaInstructions[selectedPersona] || personaInstructions['friendly-mentor']}
+${selectedPersonality.instruction}
 
 **REQUIRED OUTPUT FORMAT:**
 Your response MUST strictly adhere to this Markdown structure, starting immediately with the first heading.
@@ -76,12 +78,11 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { jobDescription, tone, persona } = req.body;
+        const { jobDescription, personality } = req.body;
 
         console.log('Received request:', { 
             hasJobDescription: !!jobDescription, 
-            tone, 
-            persona,
+            personality,
             descriptionLength: jobDescription?.length 
         });
 
@@ -89,6 +90,9 @@ export default async function handler(req, res) {
         if (!jobDescription) {
             return res.status(400).json({ error: 'Job description is required' });
         }
+
+        // Get personality config
+        const selectedPersonality = PERSONALITIES[personality] || PERSONALITIES['brutal-truth'];
 
         // Get API key from environment variable (safely stored in Vercel)
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -100,7 +104,7 @@ export default async function handler(req, res) {
         
         // --- START CORE API LOGIC AND ERROR FIXES ---
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
-        const dynamicPrompt = getDynamicPrompt(jobDescription, tone, persona);
+        const dynamicPrompt = getDynamicPrompt(jobDescription, personality);
 
         const payload = {
             contents: [{ parts: [{ text: dynamicPrompt }] }],
@@ -111,7 +115,8 @@ export default async function handler(req, res) {
             tools: [{ "google_search": {} }], 
             generationConfig: {
                  // Set max output tokens to limit response length (optional but recommended for cost control)
-                 maxOutputTokens: 2048, 
+                 maxOutputTokens: 2048,
+                 temperature: selectedPersonality.temperature
             }
         };
 
