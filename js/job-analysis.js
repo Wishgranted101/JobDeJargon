@@ -1,17 +1,15 @@
 /**
- * Job Analysis Page Logic with Demo Mode and Credit System
+ * Job Analysis Page Logic - Simplified Personality System
  */
 
-let selectedTone = 'snarky';
-let selectedPersona = 'brutally-honest';
+let selectedPersonality = 'brutal-truth'; // Default
 let currentAnalysis = null;
 
 /**
  * Initialize page
  */
 document.addEventListener('DOMContentLoaded', () => {
-    setupToneSelector();
-    setupPersonaSelector();
+    setupPersonalitySelector();
     setupAnalyzeButton();
     setupDemoButton();
     setupActionButtons();
@@ -23,31 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Setup tone selector buttons
+ * Setup personality selector (combined tone + persona)
  */
-function setupToneSelector() {
-    const toneButtons = document.querySelectorAll('#toneSelector .selector-btn');
+function setupPersonalitySelector() {
+    const personalityButtons = document.querySelectorAll('#personalitySelector .selector-btn');
     
-    toneButtons.forEach(btn => {
+    personalityButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            toneButtons.forEach(b => b.classList.remove('active'));
+            personalityButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            selectedTone = btn.getAttribute('data-tone');
-        });
-    });
-}
-
-/**
- * Setup persona selector buttons
- */
-function setupPersonaSelector() {
-    const personaButtons = document.querySelectorAll('#personaSelector .selector-btn');
-    
-    personaButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            personaButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedPersona = btn.getAttribute('data-persona');
+            selectedPersonality = btn.getAttribute('data-personality');
         });
     });
 }
@@ -96,14 +79,17 @@ function setupAnalyzeButton() {
             analyzeBtn.disabled = true;
             analyzeBtn.textContent = '⏳ Analyzing...';
             
-            const analysis = await fetchJobAnalysis(jobDescription, selectedTone, selectedPersona);
+            // Call API with combined personality
+            const analysis = await fetchJobAnalysis(
+                jobDescription, 
+                selectedPersonality
+            );
             
             // Store current analysis
             currentAnalysis = {
                 jobDescription,
                 analysis,
-                tone: selectedTone,
-                persona: selectedPersona,
+                personality: selectedPersonality,
                 timestamp: new Date().toISOString(),
                 id: Date.now()
             };
@@ -229,8 +215,7 @@ function setupActionButtons() {
                         user_id: window.currentUser.id,
                         job_description: currentAnalysis.jobDescription,
                         analysis_result: currentAnalysis.analysis,
-                        tone: currentAnalysis.tone,
-                        persona: currentAnalysis.persona
+                        personality: currentAnalysis.personality
                     }]);
                 
                 if (error) throw error;
