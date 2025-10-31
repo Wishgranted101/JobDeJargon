@@ -1,11 +1,7 @@
-/**
- * Authentication Functions
- * Handles signup, login, logout, and session management
- */
+// Authentication Functions
+// Handles signup, login, logout, and session management
 
-/**
- * Sign up a new user
- */
+// Sign up a new user
 async function signUp(email, password, name) {
     try {
         // 1. Create auth user
@@ -31,6 +27,9 @@ async function signUp(email, password, name) {
             // 3. Load the profile
             await loadUserProfile(authData.user.id);
             
+            // Trigger navigation update
+            window.dispatchEvent(new Event('userSessionChanged'));
+            
             return { success: true, message: 'Account created! Check your email to verify.' };
         }
         
@@ -40,9 +39,7 @@ async function signUp(email, password, name) {
     }
 }
 
-/**
- * Log in existing user
- */
+// Log in existing user
 async function login(email, password) {
     try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -55,6 +52,10 @@ async function login(email, password) {
         if (data.user) {
             console.log('✅ Login successful:', data.user.email);
             await loadUserProfile(data.user.id);
+            
+            // Trigger navigation update
+            window.dispatchEvent(new Event('userSessionChanged'));
+            
             return { success: true };
         }
         
@@ -64,9 +65,7 @@ async function login(email, password) {
     }
 }
 
-/**
- * Log out current user
- */
+// Log out current user
 async function logout() {
     try {
         const { error } = await supabase.auth.signOut();
@@ -75,31 +74,41 @@ async function logout() {
         window.currentUser = null;
         console.log('✅ Logged out successfully');
         
-        // Redirect to home
-        window.location.href = 'index.html';
+        // Trigger navigation update
+        window.dispatchEvent(new Event('userSessionChanged'));
+        
+        // Show toast before redirect
+        if (typeof showToast === 'function') {
+            showToast('Logged out successfully');
+        }
+        
+        // Redirect to home after a moment
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
         
     } catch (error) {
         console.error('Logout error:', error);
-        showToast('Error logging out');
+        if (typeof showToast === 'function') {
+            showToast('Error logging out');
+        }
     }
 }
 
-/**
- * Check if user is logged in
- */
+// Check if user is logged in
 function isUserLoggedIn() {
     return window.currentUser !== null && window.currentUser !== undefined;
 }
 
-/**
- * Require authentication (redirect if not logged in)
- */
+// Require authentication (redirect if not logged in)
 function requireAuth() {
     if (!isUserLoggedIn()) {
         // Save intended destination
         sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
         
-        showToast('Please sign up or log in to continue');
+        if (typeof showToast === 'function') {
+            showToast('Please sign up or log in to continue');
+        }
         
         setTimeout(() => {
             window.location.href = 'signup.html';
@@ -110,9 +119,7 @@ function requireAuth() {
     return true;
 }
 
-/**
- * Send password reset email
- */
+// Send password reset email
 async function resetPassword(email) {
     try {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -129,9 +136,7 @@ async function resetPassword(email) {
     }
 }
 
-/**
- * Update user's credit count
- */
+// Update user's credit count
 async function updateUserCredits(creditsToAdd) {
     if (!isUserLoggedIn()) return;
     
@@ -151,6 +156,9 @@ async function updateUserCredits(creditsToAdd) {
         window.currentUser.credits = newCreditCount;
         updateUserUI();
         
+        // Update navigation to show new credit count
+        window.dispatchEvent(new Event('userSessionChanged'));
+        
         console.log(`✅ Credits updated: ${creditsToAdd > 0 ? '+' : ''}${creditsToAdd}`);
         
     } catch (error) {
@@ -158,9 +166,7 @@ async function updateUserCredits(creditsToAdd) {
     }
 }
 
-/**
- * Check if user can analyze (has credits or daily free available)
- */
+// Check if user can analyze (has credits or daily free available)
 async function canUserAnalyze() {
     if (!isUserLoggedIn()) {
         return { allowed: false, reason: 'not_logged_in' };
@@ -183,9 +189,7 @@ async function canUserAnalyze() {
     return { allowed: false, reason: 'no_credits' };
 }
 
-/**
- * Use one analysis (deduct credit or mark daily free as used)
- */
+// Use one analysis (deduct credit or mark daily free as used)
 async function useAnalysis() {
     if (!isUserLoggedIn()) return false;
     
