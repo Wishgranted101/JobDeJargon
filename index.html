@@ -68,13 +68,10 @@
                 <div class="logo">
                     <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
                 </div>
+                <!-- Navigation will be dynamically updated based on login status -->
                 <nav class="nav">
                     <a href="index.html">Home</a>
-                    <a href="job-analysis.html">Analyze Job</a>
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="pro-features.html">Pro Features</a>
-                    <a href="login.html" class="btn-secondary">Login</a>
-                    <a href="signup.html" class="btn-secondary">Sign Up</a>
+                    <a href="signup.html" class="btn-primary">Sign Up</a>
                 </nav>
             </div>
         </div>
@@ -86,7 +83,6 @@
                 <h2 class="hero-title">The co-pilot that tells you if this job is actually worth it.</h2>
                 <p class="hero-subtitle">Paste any job description and get a brutally honest translation of what they're really asking for. No BS. Just clarity.</p>
                 
-
                 <div class="hero-cta">
                     <a href="job-analysis.html" class="btn-primary btn-large">Try Free Analysis</a>
                     <a href="signup.html" class="btn-secondary btn-large">Create Account</a>
@@ -100,7 +96,7 @@
             <h3 class="section-title">How It Works</h3>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">📝</div>
+                    <div class="feature-icon">📋</div>
                     <h4>Paste Job Description</h4>
                     <p>Copy any job posting and paste it into our analyzer.</p>
                 </div>
@@ -111,8 +107,8 @@
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🎭</div>
-                    <h4>Choose Your Tone</h4>
-                    <p>Snarky, Professional, or Formal - pick the vibe that works for you.</p>
+                    <h4>Choose Your Advisor</h4>
+                    <p>Brutal Truth, HR Insider, or Friendly Mentor - pick the perspective that works for you.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">✍️</div>
@@ -128,20 +124,16 @@
             <h3 class="section-title">Pick Your AI Co-Pilot</h3>
             <div class="persona-grid">
                 <div class="persona-card">
-                    <h4>💪 Brutally Honest Coach</h4>
-                    <p>No sugarcoating. Tells it like it is.</p>
+                    <h4>💪 Brutal Truth Coach</h4>
+                    <p>No sugarcoating. Tells it like it is with dark humor.</p>
                 </div>
                 <div class="persona-card">
                     <h4>🤝 Friendly Mentor</h4>
-                    <p>Supportive and professional guidance.</p>
+                    <p>Supportive and professional guidance without the snark.</p>
                 </div>
                 <div class="persona-card">
-                    <h4>👔 HR Insider</h4>
-                    <p>Industry insights from the other side.</p>
-                </div>
-                <div class="persona-card">
-                    <h4>🏢 Corporate Translator</h4>
-                    <p>Decodes corporate speak objectively.</p>
+                    <h4>💼 HR Insider</h4>
+                    <p>Industry insights from someone who's been on the other side.</p>
                 </div>
             </div>
         </div>
@@ -156,8 +148,7 @@
                     <div class="price">$0</div>
                     <ul class="pricing-features">
                         <li>✅ 1 free job analysis per day</li>
-                        <li>✅ All tone options</li>
-                        <li>✅ All 4 AI personas</li>
+                        <li>✅ All 3 AI personalities</li>
                         <li>✅ Dashboard (requires account)</li>
                         <li>✅ Save analyzed jobs (requires account)</li>
                         <li>❌ AI Resume Generator</li>
@@ -178,8 +169,6 @@
                         <li>✅ AI Cover Letter Generator</li>
                         <li>✅ Save & export documents as PDF</li>
                         <li>✅ Company analysis & ratings</li>
-                        <li>✅ Persona expansions (4 more)</li>
-                        <li>✅ Rich text editor</li>
                         <li>✅ Priority support</li>
                     </ul>
                     <a href="signup.html" class="btn-primary">Upgrade to Pro</a>
@@ -199,7 +188,7 @@
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        <p>Simply paste any job description into our analyzer. Our AI (powered by Google Gemini) will translate the corporate jargon into plain language, highlight red flags, and give you an honest assessment of what the job really entails. You can choose different tones (Snarky, Professional, Formal) and AI personas to get the perspective that works best for you.</p>
+                        <p>Simply paste any job description into our analyzer. Our AI will translate the corporate jargon into plain language, highlight red flags, and give you an honest assessment of what the job really entails. You can choose different AI personalities to get the perspective that works best for you.</p>
                     </div>
                 </div>
 
@@ -209,17 +198,17 @@
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        <p>Free users can analyze up to <strong>5 job descriptions per day</strong>. This helps us manage API costs while still providing valuable analysis to job seekers. Pro users ($9.99/month) get unlimited analyses, plus resume and cover letter generation, document saves, company insights, and more.</p>
+                        <p>Free users can analyze <strong>1 job description per day</strong>. This helps us manage API costs while still providing valuable analysis to job seekers. Pro users ($19.99/month) get unlimited analyses, plus resume and cover letter generation, document saves, company insights, and more.</p>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What's the difference between tones and personas?</span>
+                        <span>What are the different AI personalities?</span>
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        <p><strong>Tones</strong> control the style of the response (Snarky = witty and blunt, Professional = balanced, Formal = diplomatic). <strong>Personas</strong> determine who's giving you advice (Brutally Honest Coach, Friendly Mentor, HR Insider, or Corporate Translator). Mix and match to get the perfect perspective for your needs!</p>
+                        <p><strong>Brutal Truth Coach:</strong> No BS, tells it like it is with dark humor. <strong>HR Insider:</strong> Professional insights from the hiring side. <strong>Friendly Mentor:</strong> Supportive guidance without the snark. Pick whichever style resonates with you!</p>
                     </div>
                 </div>
 
@@ -229,7 +218,7 @@
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        <p><strong>Resume and Cover Letter generation is a Pro-only feature.</strong> Free users can analyze jobs up to 5 times per day, but cannot generate tailored application documents. Pro users ($9.99/month) can generate unlimited resumes and cover letters, save them, export as PDFs, and use a rich text editor for customization.</p>
+                        <p><strong>Resume and Cover Letter generation is a Pro-only feature.</strong> Free users can analyze jobs once per day, but cannot generate tailored application documents. Pro users ($19.99/month) can generate unlimited resumes and cover letters, save them, and export as PDFs.</p>
                     </div>
                 </div>
 
@@ -239,7 +228,7 @@
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-                        <p>Our AI uses Google's Gemini Pro model, which is highly advanced at understanding context and language. However, AI is a tool to help you make decisions—not make them for you. Always review the analysis and use your own judgment. Think of it as a second opinion from a knowledgeable friend, not gospel truth.</p>
+                        <p>Our AI is highly advanced at understanding context and language. However, AI is a tool to help you make decisions—not make them for you. Always review the analysis and use your own judgment. Think of it as a second opinion from a knowledgeable friend, not gospel truth.</p>
                     </div>
                 </div>
 
@@ -279,10 +268,10 @@
                         <span class="faq-icon">▼</span>
                     </div>
                     <div class="faq-answer">
-    <p>Your saved jobs and analysis history remain accessible in your dashboard. However, you'll lose access to Pro-only features like the resume generator, cover letter generator, and PDF exports.</p>
-    <p style="margin-top: 0.5rem;">After downgrading, you'll return to the Free tier with <strong>1 free job analysis per day</strong>. Any credits you purchased separately will remain in your account and can be used anytime.</p>
-    <p style="margin-top: 0.5rem;"><strong>Note:</strong> Your existing saved resumes and cover letters will be archived and can be accessed again if you upgrade back to Pro.</p>
-</div>
+                        <p>Your saved jobs and analysis history remain accessible in your dashboard. However, you'll lose access to Pro-only features like the resume generator, cover letter generator, and PDF exports.</p>
+                        <p style="margin-top: 0.5rem;">After downgrading, you'll return to the Free tier with <strong>1 free job analysis per day</strong>. Any credits you purchased separately will remain in your account and can be used anytime.</p>
+                        <p style="margin-top: 0.5rem;"><strong>Note:</strong> Your existing saved resumes and cover letters will be archived and can be accessed again if you upgrade back to Pro.</p>
+                    </div>
                 </div>
 
                 <div class="faq-item">
@@ -320,8 +309,8 @@
                 </div>
                 <div class="footer-section">
                     <h4>Company</h4>
-                     <a href="about.html">About Us</a>
-                    </div>
+                    <a href="about.html">About Us</a>
+                </div>
                 <div class="footer-section">
                     <h4>Support</h4>
                     <a href="contact.html">Contact Us</a>
@@ -334,6 +323,11 @@
         </div>
     </footer>
 
+    <div id="toast" class="toast"></div>
+
+    <!-- CRITICAL: Load scripts in this exact order -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     
     <script>
@@ -351,6 +345,53 @@
                 faqItem.classList.add('active');
             }
         }
+
+        // Dynamic Navigation Based on Auth Status
+        function updateNavigationBasedOnAuth() {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            
+            const isLoggedIn = window.currentUser !== null && window.currentUser !== undefined;
+            
+            if (isLoggedIn) {
+                // LOGGED IN - Show full navigation with logout
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="settings.html">Settings</a>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${window.currentUser.credits || 0} credits
+                        </span>
+                        <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            } else {
+                // LOGGED OUT - Show simple navigation with Sign Up
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="signup.html" class="btn-primary">Sign Up</a>
+                `;
+            }
+        }
+
+        // Run after Supabase loads (wait for session check)
+        setTimeout(() => {
+            updateNavigationBasedOnAuth();
+        }, 1000);
+
+        // Also run immediately in case already loaded
+        if (typeof window.currentUser !== 'undefined') {
+            updateNavigationBasedOnAuth();
+        }
+
+        // Listen for auth changes (when user logs in/out)
+        window.addEventListener('userSessionChanged', () => {
+            updateNavigationBasedOnAuth();
+        });
     </script>
 </body>
 </html>
