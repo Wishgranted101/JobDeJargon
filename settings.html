@@ -164,24 +164,44 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/navigation.js"></script>
     
     <script>
-        // ⚠️ AUTHENTICATION GUARD - Redirect if not logged in
-        document.addEventListener('DOMContentLoaded', () => {
-            // Wait for Supabase to initialize
-            setTimeout(() => {
-                if (!isUserLoggedIn()) {
-                    showToast('Please log in to access settings');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 1500);
-                } else {
-                    // Load user data
-                    loadUserSettings();
+        // ⚠️ AUTHENTICATION GUARD - Must run IMMEDIATELY, not in DOMContentLoaded
+        // Check authentication synchronously
+        (function() {
+            // Wait a tiny bit for Supabase to load
+            let checkCount = 0;
+            const maxChecks = 10;
+            
+            const checkAuth = setInterval(() => {
+                checkCount++;
+                
+                // If isUserLoggedIn function exists, check it
+                if (typeof isUserLoggedIn === 'function') {
+                    clearInterval(checkAuth);
+                    
+                    if (!isUserLoggedIn()) {
+                        // Block the page content
+                        document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: system-ui;"><div style="text-align: center;"><h2>🔒 Authentication Required</h2><p style="color: #666; margin: 1rem 0;">Redirecting to login...</p></div></div>';
+                        
+                        // Redirect after a moment
+                        setTimeout(() => {
+                            sessionStorage.setItem('redirectAfterLogin', 'settings.html');
+                            window.location.href = 'login.html';
+                        }, 1000);
+                    } else {
+                        // User is logged in, load settings
+                        loadUserSettings();
+                    }
+                }
+                
+                // Give up after max checks (5 seconds)
+                if (checkCount >= maxChecks) {
+                    clearInterval(checkAuth);
+                    console.error('⚠️ Authentication check timed out');
                 }
             }, 500);
-        });
+        })();
         
         // Load user settings
         function loadUserSettings() {
