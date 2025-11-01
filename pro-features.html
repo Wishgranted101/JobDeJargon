@@ -345,7 +345,7 @@
             }
         }
 
-        // Dynamic Navigation Based on Auth Status
+        // Dynamic Navigation Based on Auth Status (SIMPLIFIED - NO HIDING)
         function updateNavigationBasedOnAuth() {
             const nav = document.querySelector('.nav');
             if (!nav) return;
@@ -378,31 +378,39 @@
                     <a href="signup.html" class="btn-secondary">Sign Up</a>
                 `;
             }
-            
-            // Make navigation visible after updating
-            nav.style.opacity = '1';
         }
 
-        // Hide navigation initially to prevent flash
-        const nav = document.querySelector('.nav');
-        if (nav) {
-            nav.style.opacity = '0';
-            nav.style.transition = 'opacity 0.3s';
+        // Check auth immediately and keep checking
+        function initNavigation() {
+            // Try to update navigation
+            if (typeof window.currentUser !== 'undefined') {
+                updateNavigationBasedOnAuth();
+            } else {
+                // If currentUser not ready, show logged-out nav as default
+                const nav = document.querySelector('.nav');
+                if (nav && nav.innerHTML.trim() === '') {
+                    nav.innerHTML = `
+                        <a href="index.html">Home</a>
+                        <a href="pro-features.html">Pro Features</a>
+                        <a href="login.html" class="btn-secondary">Login</a>
+                        <a href="signup.html" class="btn-secondary">Sign Up</a>
+                    `;
+                }
+            }
         }
 
-        // Check auth status multiple times quickly until Supabase loads
+        // Run immediately
+        initNavigation();
+
+        // Keep checking for 2 seconds
         let checkCount = 0;
-        const maxChecks = 20; // Check for up to 2 seconds (20 x 100ms)
-        
-        const authCheckInterval = setInterval(() => {
+        const checkInterval = setInterval(() => {
             checkCount++;
-            
-            // If Supabase has loaded and checked session
-            if (typeof window.currentUser !== 'undefined' || checkCount >= maxChecks) {
-                clearInterval(authCheckInterval);
+            if (typeof window.currentUser !== 'undefined' || checkCount > 20) {
+                clearInterval(checkInterval);
                 updateNavigationBasedOnAuth();
             }
-        }, 100); // Check every 100ms instead of waiting 1 second
+        }, 100);
 
         // Listen for auth changes (when user logs in/out)
         window.addEventListener('userSessionChanged', () => {
