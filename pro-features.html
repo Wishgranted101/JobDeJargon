@@ -30,11 +30,12 @@
                 <div class="logo">
                     <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
                 </div>
+                <!-- Navigation will be dynamically updated based on login status -->
                 <nav class="nav">
                     <a href="index.html">Home</a>
-                    <a href="job-analysis.html">Analyze Job</a>
-                    <a href="dashboard.html">Dashboard</a>
                     <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                    <a href="signup.html" class="btn-secondary">Sign Up</a>
                 </nav>
             </div>
         </div>
@@ -207,15 +208,15 @@
         <!-- Tab: Personas -->
         <div id="personasTab" class="tab-content" style="display: none;">
             <div class="card" style="max-width: 800px; margin: 0 auto;">
-                <h3 style="margin-bottom: 1rem;">🎭 Expanded AI Personas</h3>
+                <h3 style="margin-bottom: 1rem;">🎭 AI Personalities</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    Pro users get access to additional specialized AI personas for different contexts.
+                    Choose the AI advisor that matches your style.
                 </p>
                 
                 <div class="persona-grid">
                     <div class="persona-card">
-                        <h4>💪 Brutally Honest Coach</h4>
-                        <p>No sugarcoating. Tells it like it is.</p>
+                        <h4>💪 Brutal Truth Coach</h4>
+                        <p>No sugarcoating. Tells it like it is with dark humor.</p>
                         <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
                     </div>
                     <div class="persona-card">
@@ -225,33 +226,8 @@
                     </div>
                     <div class="persona-card">
                         <h4>👔 HR Insider</h4>
-                        <p>Industry insights from the other side.</p>
+                        <p>Industry insights from the hiring side.</p>
                         <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
-                    </div>
-                    <div class="persona-card">
-                        <h4>🏢 Corporate Translator</h4>
-                        <p>Decodes corporate speak objectively.</p>
-                        <span style="color: var(--success); font-size: 0.875rem;">✓ Free</span>
-                    </div>
-                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
-                        <div class="badge" style="top: -10px;">Pro</div>
-                        <h4>🔥 Corporate Burnout Therapist</h4>
-                        <p>Identifies toxic patterns and red flags.</p>
-                    </div>
-                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
-                        <div class="badge" style="top: -10px;">Pro</div>
-                        <h4>🕵️ Recruiter Decoder</h4>
-                        <p>Reveals what recruiters really mean.</p>
-                    </div>
-                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
-                        <div class="badge" style="top: -10px;">Pro</div>
-                        <h4>🎯 Career Strategist</h4>
-                        <p>Long-term career planning perspective.</p>
-                    </div>
-                    <div class="persona-card" style="border: 2px solid var(--primary); position: relative;">
-                        <div class="badge" style="top: -10px;">Pro</div>
-                        <h4>💼 Salary Negotiation Coach</h4>
-                        <p>Focuses on compensation analysis.</p>
                     </div>
                 </div>
             </div>
@@ -280,6 +256,8 @@
         </div>
         
     </main>
+
+    <div id="toast" class="toast"></div>
 
     <footer class="footer">
         <div class="container">
@@ -317,6 +295,7 @@
     </footer>
 
     <script src="js/supabase-client.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
     
     <script>
@@ -352,19 +331,68 @@
                 
                 if (error) {
                     if (error.code === '23505') {
-                        alert('You\'re already on the waitlist!');
+                        showToast('You\'re already on the waitlist!');
                     } else {
                         throw error;
                     }
                 } else {
-                    alert('✅ You\'re on the list! We\'ll email you when Pro launches with 50% off.');
+                    showToast('✅ You\'re on the list! We\'ll email you when Pro launches with 50% off.');
                     document.getElementById('proWaitlistFormBottom').reset();
                 }
             } catch (error) {
                 console.error('Error joining waitlist:', error);
-                alert('Error joining waitlist. Please try again.');
+                showToast('Error joining waitlist. Please try again.');
             }
         }
+
+        // Dynamic Navigation Based on Auth Status
+        function updateNavigationBasedOnAuth() {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            
+            const isLoggedIn = window.currentUser !== null && window.currentUser !== undefined;
+            
+            if (isLoggedIn) {
+                // LOGGED IN - Show full navigation with logout
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="settings.html">Settings</a>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${window.currentUser.credits || 0} credits
+                        </span>
+                        <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            } else {
+                // LOGGED OUT - Show public navigation
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                    <a href="signup.html" class="btn-secondary">Sign Up</a>
+                `;
+            }
+        }
+
+        // Run after Supabase loads (wait for session check)
+        setTimeout(() => {
+            updateNavigationBasedOnAuth();
+        }, 1000);
+
+        // Also run immediately in case already loaded
+        if (typeof window.currentUser !== 'undefined') {
+            updateNavigationBasedOnAuth();
+        }
+
+        // Listen for auth changes (when user logs in/out)
+        window.addEventListener('userSessionChanged', () => {
+            updateNavigationBasedOnAuth();
+        });
     </script>
 </body>
 </html>
