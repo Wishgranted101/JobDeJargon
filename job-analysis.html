@@ -14,19 +14,12 @@
                 <div class="logo">
                     <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
                 </div>
+                <!-- Navigation will be dynamically updated based on login status -->
                 <nav class="nav">
                     <a href="index.html">Home</a>
-                    <a href="job-analysis.html">Analyze Job</a>
-                    <a href="dashboard.html">Dashboard</a>
                     <a href="pro-features.html">Pro Features</a>
-                    <span id="userInfo" style="display: none;">
-                        <span id="creditDisplay" style="margin-right: 1rem; color: var(--primary); font-weight: 600;"></span>
-                        <button onclick="logout()" class="btn-secondary">Logout</button>
-                    </span>
-                    <span id="guestInfo">
-                        <a href="login.html" class="btn-secondary">Login</a>
-                        <a href="signup.html" class="btn-secondary">Sign Up</a>
-                    </span>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                    <a href="signup.html" class="btn-secondary">Sign Up</a>
                 </nav>
             </div>
         </div>
@@ -171,33 +164,6 @@
     <script src="js/resume-generator.js"></script>
     
     <script>
-        // Update UI based on login status
-        function updateAuthUI() {
-            const userInfo = document.getElementById('userInfo');
-            const guestInfo = document.getElementById('guestInfo');
-            const creditDisplay = document.getElementById('creditDisplay');
-            
-            if (isUserLoggedIn()) {
-                userInfo.style.display = 'flex';
-                userInfo.style.alignItems = 'center';
-                userInfo.style.gap = '1rem';
-                guestInfo.style.display = 'none';
-                
-                const credits = window.currentUser.credits || 0;
-                creditDisplay.textContent = `💳 ${credits} credits`;
-            } else {
-                userInfo.style.display = 'none';
-                guestInfo.style.display = 'flex';
-            }
-        }
-        
-        // Check auth status when Supabase loads
-        setTimeout(() => {
-            if (typeof isUserLoggedIn === 'function') {
-                updateAuthUI();
-            }
-        }, 1000);
-        
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('active');
         }
@@ -205,6 +171,70 @@
         function closeBuyCreditsModal() {
             document.getElementById('buyCreditsModal').classList.remove('active');
         }
+
+        // Dynamic Navigation Based on Auth Status
+        function updateNavigationBasedOnAuth() {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            
+            const isLoggedIn = window.currentUser !== null && window.currentUser !== undefined;
+            
+            if (isLoggedIn) {
+                // LOGGED IN - Show full navigation with logout
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="job-analysis.html">Analyze Job</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="settings.html">Settings</a>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--primary); font-size: 0.9rem; font-weight: 600;">
+                            💳 ${window.currentUser.credits || 0} credits
+                        </span>
+                        <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            } else {
+                // LOGGED OUT - Show public navigation
+                nav.innerHTML = `
+                    <a href="index.html">Home</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
+                    <a href="signup.html" class="btn-secondary">Sign Up</a>
+                `;
+            }
+            
+            // Make navigation visible after updating
+            nav.style.opacity = '1';
+        }
+
+        // Hide navigation initially to prevent flash
+        const nav = document.querySelector('.nav');
+        if (nav) {
+            nav.style.opacity = '0';
+            nav.style.transition = 'opacity 0.3s';
+        }
+
+        // Check auth status multiple times quickly until Supabase loads
+        let checkCount = 0;
+        const maxChecks = 20; // Check for up to 2 seconds (20 x 100ms)
+        
+        const authCheckInterval = setInterval(() => {
+            checkCount++;
+            
+            // If Supabase has loaded and checked session
+            if (typeof window.currentUser !== 'undefined' || checkCount >= maxChecks) {
+                clearInterval(authCheckInterval);
+                updateNavigationBasedOnAuth();
+            }
+        }, 100); // Check every 100ms instead of waiting 1 second
+
+        // Listen for auth changes
+        window.addEventListener('userSessionChanged', () => {
+            updateNavigationBasedOnAuth();
+        });
     </script>
 </body>
 </html>
