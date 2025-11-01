@@ -358,10 +358,11 @@
                     <a href="index.html">Home</a>
                     <a href="job-analysis.html">Analyze Job</a>
                     <a href="dashboard.html">Dashboard</a>
+                    <a href="pro-features.html">Pro Features</a>
                     <a href="settings.html">Settings</a>
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
-                            ${window.currentUser.credits || 0} credits
+                        <span style="color: var(--primary); font-size: 0.9rem; font-weight: 600;">
+                            💳 ${window.currentUser.credits || 0} credits
                         </span>
                         <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">
                             Logout
@@ -377,17 +378,31 @@
                     <a href="signup.html" class="btn-secondary">Sign Up</a>
                 `;
             }
+            
+            // Make navigation visible after updating
+            nav.style.opacity = '1';
         }
 
-        // Run after Supabase loads (wait for session check)
-        setTimeout(() => {
-            updateNavigationBasedOnAuth();
-        }, 1000);
-
-        // Also run immediately in case already loaded
-        if (typeof window.currentUser !== 'undefined') {
-            updateNavigationBasedOnAuth();
+        // Hide navigation initially to prevent flash
+        const nav = document.querySelector('.nav');
+        if (nav) {
+            nav.style.opacity = '0';
+            nav.style.transition = 'opacity 0.3s';
         }
+
+        // Check auth status multiple times quickly until Supabase loads
+        let checkCount = 0;
+        const maxChecks = 20; // Check for up to 2 seconds (20 x 100ms)
+        
+        const authCheckInterval = setInterval(() => {
+            checkCount++;
+            
+            // If Supabase has loaded and checked session
+            if (typeof window.currentUser !== 'undefined' || checkCount >= maxChecks) {
+                clearInterval(authCheckInterval);
+                updateNavigationBasedOnAuth();
+            }
+        }, 100); // Check every 100ms instead of waiting 1 second
 
         // Listen for auth changes (when user logs in/out)
         window.addEventListener('userSessionChanged', () => {
