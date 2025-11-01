@@ -71,6 +71,8 @@
                 <!-- Navigation will be dynamically updated based on login status -->
                 <nav class="nav">
                     <a href="index.html">Home</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
                     <a href="signup.html" class="btn-secondary">Sign Up</a>
                 </nav>
             </div>
@@ -370,9 +372,11 @@
                     </div>
                 `;
             } else {
-                // LOGGED OUT - Show simple navigation with Sign Up (GRAY, not purple)
+                // LOGGED OUT - Show simple navigation with all public pages
                 nav.innerHTML = `
                     <a href="index.html">Home</a>
+                    <a href="pro-features.html">Pro Features</a>
+                    <a href="login.html" class="btn-secondary">Login</a>
                     <a href="signup.html" class="btn-secondary">Sign Up</a>
                 `;
             }
