@@ -1,5 +1,6 @@
 /**
  * Job Analysis Page Logic - Simplified Personality System
+ * TESTING VERSION - Daily limit removed
  */
 
 let selectedPersonality = 'brutal-truth'; // Default
@@ -64,6 +65,10 @@ function setupAnalyzeButton() {
             return;
         }
         
+        // ⚠️ TESTING MODE: Daily limit check REMOVED
+        // This allows unlimited testing of analyze feature
+        // TODO: Re-enable credit checks before production
+        /*
         // Check if user can analyze (has credits or daily free)
         const canAnalyze = await canUserAnalyze();
         
@@ -73,6 +78,7 @@ function setupAnalyzeButton() {
                 return;
             }
         }
+        */
         
         // Fetch analysis
         try {
@@ -97,22 +103,8 @@ function setupAnalyzeButton() {
             // Display results
             displayAnalysis(analysis);
             
-            // Show credit status
-            if (window.currentUser) {
-                const credits = window.currentUser.credits || 0;
-                if (credits === 0) {
-                    const today = new Date().toISOString().split('T')[0];
-                    const lastFree = window.currentUser.last_free_analysis_date;
-                    
-                    if (lastFree === today) {
-                        showToast('Free daily analysis used! Buy credits for more.');
-                    } else {
-                        showToast('Analysis complete! You have 1 free analysis per day.');
-                    }
-                } else {
-                    showToast(`Analysis complete! ${credits} credit${credits === 1 ? '' : 's'} remaining.`);
-                }
-            }
+            // Show credit status (for testing only)
+            showToast('Analysis complete! (Testing mode - no credits deducted)');
             
         } catch (error) {
             console.error('Analysis error:', error);
