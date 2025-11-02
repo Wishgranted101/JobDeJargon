@@ -1,9 +1,13 @@
 // API.js - Credit System + Daily Free Analysis
 // Updated for simplified personality system
 // COMPLETE VERSION with all helper functions
+// ⚠️ TESTING MODE - Credit checks DISABLED
 
 // Fetch job analysis with credit/daily free checking
 async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
+    // ⚠️ TESTING MODE: Credit check DISABLED for testing
+    // TODO: Re-enable before production
+    /*
     // Check if user can analyze
     const canAnalyze = await canUserAnalyze();
     
@@ -16,6 +20,7 @@ async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
             throw new Error('No credits available');
         }
     }
+    */
     
     try {
         showSpinner();
@@ -38,11 +43,15 @@ async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
 
         const data = await response.json();
         
+        // ⚠️ TESTING MODE: Credit deduction DISABLED
+        // TODO: Re-enable before production
+        /*
         // Deduct credit or mark daily free as used
         await useAnalysis();
         
         // Update UI to show new credit count
         updateUserUI();
+        */
         
         hideSpinner();
         return data.analysis;
