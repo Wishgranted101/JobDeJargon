@@ -227,14 +227,15 @@ function setupActionButtons() {
                     throw new Error('Supabase is not initialized. Please refresh the page.');
                 }
                 
-                // Save to Supabase using YOUR column names
+                // Save to Supabase using YOUR exact column names
                 const { data, error } = await supabase
                     .from('analyses')
                     .insert([{
                         user_id: window.currentUser.id,
                         job_description: currentAnalysis.jobDescription,
-                        analysis_result: currentAnalysis.analysis, // ✅ Using YOUR column name
-                        personality: currentAnalysis.personality,
+                        analysis_result: currentAnalysis.analysis,
+                        tone: currentAnalysis.personality, // ✅ Maps to 'tone' column
+                        persona: currentAnalysis.personality, // ✅ Also save to 'persona' column
                         created_at: new Date().toISOString()
                     }])
                     .select()
