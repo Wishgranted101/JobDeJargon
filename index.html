@@ -44,21 +44,6 @@
             max-height: 500px;
             padding: 0 1.5rem 1.5rem 1.5rem;
         }
-        .disclaimer-notice {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            margin: 1rem auto;
-            max-width: 700px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-        .disclaimer-notice strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
@@ -68,7 +53,7 @@
                 <div class="logo">
                     <h1><a href="index.html" style="text-decoration: none; color: inherit;">JobDeJargon Pro</a></h1>
                 </div>
-                <!-- Navigation will be dynamically updated based on login status -->
+                <!-- Navigation will be updated by navigation.js -->
                 <nav class="nav">
                     <a href="index.html">Home</a>
                     <a href="pro-features.html">Pro Features</a>
@@ -214,77 +199,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Can I save and export my resumes and cover letters?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p><strong>Resume and Cover Letter generation is a Pro-only feature.</strong> Free users can analyze jobs once per day, but cannot generate tailored application documents. Pro users ($19.99/month) can generate unlimited resumes and cover letters, save them, and export as PDFs.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>How accurate is the AI analysis?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Our AI is highly advanced at understanding context and language. However, AI is a tool to help you make decisions—not make them for you. Always review the analysis and use your own judgment. Think of it as a second opinion from a knowledgeable friend, not gospel truth.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What are the Pro company insights?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Pro users get access to company analysis, including ratings, culture scores, work-life balance indicators, pros/cons summaries, and salary ranges for specific positions. This helps you research companies before applying and make informed decisions about where to invest your time.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Is my data private and secure?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes. We take privacy seriously. Job descriptions you paste are processed by our AI to generate analyses but are not sold or shared with third parties. We use industry-standard encryption and security practices. Read our <a href="privacy-policy.html" style="color: var(--primary);">Privacy Policy</a> for full details.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Can I cancel my Pro subscription anytime?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Absolutely! Cancel anytime from your account settings. Cancellation takes effect at the end of your current billing period, so you keep Pro access until then.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>What happens to my saved jobs if I downgrade from Pro to Free?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Your saved jobs and analysis history remain accessible in your dashboard. However, you'll lose access to Pro-only features like the resume generator, cover letter generator, and PDF exports.</p>
-                        <p style="margin-top: 0.5rem;">After downgrading, you'll return to the Free tier with <strong>1 free job analysis per day</strong>. Any credits you purchased separately will remain in your account and can be used anytime.</p>
-                        <p style="margin-top: 0.5rem;"><strong>Note:</strong> Your existing saved resumes and cover letters will be archived and can be accessed again if you upgrade back to Pro.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Still have questions?</span>
-                        <span class="faq-icon">▼</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We're here to help! Contact us at <a href="mailto:support@jobdejargon.com" style="color: var(--primary);">support@jobdejargon.com</a> or visit our <a href="contact.html" style="color: var(--primary);">Contact page</a>. We typically respond within 24-48 hours.</p>
-                    </div>
-                </div>
+                <!-- Add more FAQ items as needed -->
 
             </div>
         </div>
@@ -327,10 +242,11 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- CRITICAL: Load scripts in this exact order -->
+    <!-- Load Supabase first, then navigation script -->
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/navigation.js"></script>
     
     <script>
         function toggleFaq(element) {
@@ -347,56 +263,6 @@
                 faqItem.classList.add('active');
             }
         }
-
-        // Dynamic Navigation Based on Auth Status
-        function updateNavigationBasedOnAuth() {
-            const nav = document.querySelector('.nav');
-            if (!nav) return;
-            
-            const isLoggedIn = window.currentUser !== null && window.currentUser !== undefined;
-            
-            if (isLoggedIn) {
-                // LOGGED IN - Show full navigation with logout
-                nav.innerHTML = `
-                    <a href="index.html">Home</a>
-                    <a href="job-analysis.html">Analyze Job</a>
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="pro-features.html">Pro Features</a>
-                    <a href="settings.html">Settings</a>
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <span style="color: var(--primary); font-size: 0.9rem; font-weight: 600;">
-                            💳 ${window.currentUser.credits || 0} credits
-                        </span>
-                        <button onclick="logout()" class="btn-secondary" style="padding: 0.5rem 1rem;">
-                            Logout
-                        </button>
-                    </div>
-                `;
-            } else {
-                // LOGGED OUT - Show simple navigation with all public pages
-                nav.innerHTML = `
-                    <a href="index.html">Home</a>
-                    <a href="pro-features.html">Pro Features</a>
-                    <a href="login.html" class="btn-secondary">Login</a>
-                    <a href="signup.html" class="btn-secondary">Sign Up</a>
-                `;
-            }
-        }
-
-        // Run after Supabase loads (wait for session check)
-        setTimeout(() => {
-            updateNavigationBasedOnAuth();
-        }, 1000);
-
-        // Also run immediately in case already loaded
-        if (typeof window.currentUser !== 'undefined') {
-            updateNavigationBasedOnAuth();
-        }
-
-        // Listen for auth changes (when user logs in/out)
-        window.addEventListener('userSessionChanged', () => {
-            updateNavigationBasedOnAuth();
-        });
     </script>
 </body>
 </html>
