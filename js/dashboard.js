@@ -1,5 +1,6 @@
 /**
  * Dashboard Logic - Job Application Tracker
+ * FIXED: Now loads from Supabase instead of localStorage
  */
 
 let dashboardData = {
@@ -16,39 +17,140 @@ let currentJobForModal = null;
 /**
  * Initialize dashboard
  */
-document.addEventListener('DOMContentLoaded', () => {
-    loadDashboardData();
+document.addEventListener('DOMContentLoaded', async () => {
+    // Show loading state
+    showLoadingState();
+    
+    // Load data from Supabase
+    await loadDashboardData();
+    
+    // Render everything
     renderAllSections();
     updateStats();
+    
+    // Hide loading state
+    hideLoadingState();
 });
 
 /**
- * Load dashboard data from localStorage
+ * Show loading state
  */
-function loadDashboardData() {
-    const savedJobs = loadFromLocal('savedJobs') || [];
-    const existingData = loadFromLocal('dashboardData');
-    
-    if (existingData) {
-        dashboardData = existingData;
-    }
-    
-    savedJobs.forEach(job => {
-        const exists = Object.values(dashboardData).flat().some(j => j.id === job.id);
-        if (!exists) {
-            job.status = 'analyzed';
-            dashboardData.analyzed.push(job);
-        }
-    });
-    
-    saveDashboardData();
+function showLoadingState() {
+    const container = document.querySelector('.dashboard-container') || document.body;
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'dashboardLoading';
+    loadingDiv.innerHTML = `
+        <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <div>Loading your saved analyses...</div>
+        </div>
+    `;
+    container.prepend(loadingDiv);
 }
 
 /**
- * Save dashboard data to localStorage
+ * Hide loading state
+ */
+function hideLoadingState() {
+    const loading = document.getElementById('dashboardLoading');
+    if (loading) loading.remove();
+}
+
+/**
+ * Load dashboard data from Supabase
+ */
+async function loadDashboardData() {
+    try {
+        // Check if user is logged in
+        if (!window.currentUser || !window.currentUser.id) {
+            console.error('User not logged in');
+            showToast('Please log in to view your dashboard', 'warning');
+            return;
+        }
+        
+        // Fetch analyses from Supabase
+        const { data, error } = await supabase
+            .from('analyses')
+            .select('*')
+            .eq('user_id', window.currentUser.id)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading analyses:', error);
+            showToast('Error loading saved analyses', 'error');
+            return;
+        }
+        
+        console.log('✅ Loaded analyses from Supabase:', data);
+        
+        // Convert Supabase data to dashboard format
+        if (data && data.length > 0) {
+            data.forEach(analysis => {
+                const job = {
+                    id: analysis.id,
+                    jobDescription: analysis.job_description,
+                    analysis: analysis.analysis_result,
+                    tone: analysis.tone || 'brutal-truth',
+                    persona: analysis.persona || analysis.tone || 'brutal-truth',
+                    timestamp: analysis.created_at,
+                    status: analysis.status || 'analyzed'
+                };
+                
+                // Add to appropriate status array
+                const status = job.status || 'analyzed';
+                if (dashboardData[status]) {
+                    dashboardData[status].push(job);
+                }
+            });
+        }
+        
+        // Also load any localStorage data (for backward compatibility)
+        const localData = loadFromLocal('dashboardData');
+        if (localData) {
+            // Merge localStorage data with Supabase data
+            Object.keys(localData).forEach(status => {
+                localData[status].forEach(job => {
+                    // Only add if not already loaded from Supabase
+                    const exists = dashboardData[status].some(j => j.id === job.id);
+                    if (!exists) {
+                        dashboardData[status].push(job);
+                    }
+                });
+            });
+        }
+        
+        // Save merged data back to localStorage
+        saveDashboardData();
+        
+    } catch (error) {
+        console.error('Error in loadDashboardData:', error);
+        showToast('Error loading dashboard data', 'error');
+    }
+}
+
+/**
+ * Save dashboard data to localStorage (for offline access)
  */
 function saveDashboardData() {
     saveToLocal('dashboardData', dashboardData);
+}
+
+/**
+ * Save status update to Supabase
+ */
+async function updateJobStatusInSupabase(jobId, newStatus) {
+    try {
+        const { error } = await supabase
+            .from('analyses')
+            .update({ status: newStatus })
+            .eq('id', jobId);
+        
+        if (error) {
+            console.error('Error updating status in Supabase:', error);
+        }
+    } catch (error) {
+        console.error('Error updating Supabase:', error);
+    }
 }
 
 /**
@@ -68,6 +170,11 @@ function renderAllSections() {
  */
 function renderSection(sectionId, jobs) {
     const container = document.getElementById(`${sectionId}Section`);
+    
+    if (!container) {
+        console.warn(`Container not found for section: ${sectionId}`);
+        return;
+    }
     
     if (jobs.length === 0) {
         const emptyMessages = {
@@ -109,7 +216,7 @@ function createJobCard(job, status) {
                 <div>
                     <div class="job-title">${jobTitle}</div>
                     <div class="job-company" style="margin-top: 0.25rem;">
-                        ${job.tone} • ${job.persona}
+                        ${job.tone || 'brutal-truth'} • ${job.persona || job.tone || 'brutal-truth'}
                     </div>
                 </div>
             </div>
@@ -148,12 +255,21 @@ function extractJobTitle(description) {
  * Update statistics - FIXED to include all 6 categories
  */
 function updateStats() {
-    document.getElementById('statAnalyzed').textContent = dashboardData.analyzed.length;
-    document.getElementById('statToApply').textContent = dashboardData.toApply.length;
-    document.getElementById('statApplied').textContent = dashboardData.applied.length;
-    document.getElementById('statInterviewed').textContent = dashboardData.interviewed.length;
-    document.getElementById('statOffers').textContent = dashboardData.offers.length;
-    document.getElementById('statRejected').textContent = dashboardData.rejected.length;
+    const statElements = {
+        statAnalyzed: dashboardData.analyzed.length,
+        statToApply: dashboardData.toApply.length,
+        statApplied: dashboardData.applied.length,
+        statInterviewed: dashboardData.interviewed.length,
+        statOffers: dashboardData.offers.length,
+        statRejected: dashboardData.rejected.length
+    };
+    
+    Object.entries(statElements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    });
 }
 
 /**
@@ -166,14 +282,16 @@ function openJobDetailModal(job, currentStatus) {
     const title = document.getElementById('modalJobTitle');
     const content = document.getElementById('modalJobContent');
     
+    if (!modal || !title || !content) return;
+    
     title.textContent = extractJobTitle(job.jobDescription);
     
     content.innerHTML = `
         <div style="margin-bottom: 1rem;">
             <strong>Status:</strong> ${formatStatus(currentStatus)}<br>
             <strong>Analyzed:</strong> ${new Date(job.timestamp).toLocaleString()}<br>
-            <strong>Tone:</strong> ${job.tone}<br>
-            <strong>Persona:</strong> ${job.persona}
+            <strong>Tone:</strong> ${job.tone || 'brutal-truth'}<br>
+            <strong>Persona:</strong> ${job.persona || job.tone || 'brutal-truth'}
         </div>
         <div style="background: var(--surface); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
             <strong>Job Description:</strong>
@@ -191,29 +309,42 @@ function openJobDetailModal(job, currentStatus) {
     
     modal.classList.add('active');
     
-    document.getElementById('modalMoveBtn').onclick = () => {
-        closeJobDetailModal();
-        openMoveJobModal();
-    };
+    const moveBtn = document.getElementById('modalMoveBtn');
+    const duplicateBtn = document.getElementById('modalDuplicateBtn');
+    const deleteBtn = document.getElementById('modalDeleteBtn');
     
-    document.getElementById('modalDuplicateBtn').onclick = () => {
-        duplicateJob(job.id, currentStatus);
-        closeJobDetailModal();
-    };
-    
-    document.getElementById('modalDeleteBtn').onclick = () => {
-        if (confirm('Are you sure you want to delete this job?')) {
-            deleteJob(job.id, currentStatus);
+    if (moveBtn) {
+        moveBtn.onclick = () => {
             closeJobDetailModal();
-        }
-    };
+            openMoveJobModal();
+        };
+    }
+    
+    if (duplicateBtn) {
+        duplicateBtn.onclick = () => {
+            duplicateJob(job.id, currentStatus);
+            closeJobDetailModal();
+        };
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.onclick = () => {
+            if (confirm('Are you sure you want to delete this job?')) {
+                deleteJob(job.id, currentStatus);
+                closeJobDetailModal();
+            }
+        };
+    }
 }
 
 /**
  * Close job detail modal
  */
 function closeJobDetailModal() {
-    document.getElementById('jobDetailModal').classList.remove('active');
+    const modal = document.getElementById('jobDetailModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 /**
@@ -235,20 +366,26 @@ function formatStatus(status) {
  * Open move job modal
  */
 function openMoveJobModal() {
-    document.getElementById('moveJobModal').classList.add('active');
+    const modal = document.getElementById('moveJobModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
 }
 
 /**
  * Close move job modal
  */
 function closeMoveJobModal() {
-    document.getElementById('moveJobModal').classList.remove('active');
+    const modal = document.getElementById('moveJobModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 /**
  * Move job to different status
  */
-function moveJobTo(newStatus) {
+async function moveJobTo(newStatus) {
     if (!currentJobForModal) return;
     
     const { job, status: oldStatus } = currentJobForModal;
@@ -260,6 +397,9 @@ function moveJobTo(newStatus) {
     
     job.status = newStatus;
     dashboardData[newStatus].push(job);
+    
+    // Update in Supabase
+    await updateJobStatusInSupabase(job.id, newStatus);
     
     saveDashboardData();
     renderAllSections();
@@ -274,7 +414,7 @@ function moveJobTo(newStatus) {
 /**
  * Quick move (cycles through statuses)
  */
-function quickMove(jobId, currentStatus) {
+async function quickMove(jobId, currentStatus) {
     const statusCycle = ['analyzed', 'toApply', 'applied', 'interviewed', 'offers'];
     const currentIndex = statusCycle.indexOf(currentStatus);
     const nextStatus = statusCycle[(currentIndex + 1) % statusCycle.length];
@@ -285,6 +425,9 @@ function quickMove(jobId, currentStatus) {
         dashboardData[currentStatus].splice(jobIndex, 1);
         job.status = nextStatus;
         dashboardData[nextStatus].push(job);
+        
+        // Update in Supabase
+        await updateJobStatusInSupabase(job.id, nextStatus);
         
         saveDashboardData();
         renderAllSections();
@@ -318,10 +461,24 @@ function duplicateJob(jobId, status) {
 /**
  * Delete job
  */
-function deleteJob(jobId, status) {
+async function deleteJob(jobId, status) {
     const index = dashboardData[status].findIndex(j => j.id == jobId);
     if (index !== -1) {
         dashboardData[status].splice(index, 1);
+        
+        // Delete from Supabase
+        try {
+            const { error } = await supabase
+                .from('analyses')
+                .delete()
+                .eq('id', jobId);
+            
+            if (error) {
+                console.error('Error deleting from Supabase:', error);
+            }
+        } catch (error) {
+            console.error('Error deleting:', error);
+        }
         
         saveDashboardData();
         renderSection(status, dashboardData[status]);
