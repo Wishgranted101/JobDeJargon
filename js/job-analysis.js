@@ -1,6 +1,6 @@
 /**
  * Job Analysis Page Logic - Simplified Personality System
- * TESTING VERSION - Daily limit removed
+ * TESTING VERSION - Daily limit removed + Auto-save enabled
  */
 
 let selectedPersonality = 'brutal-truth'; // Default
@@ -68,17 +68,6 @@ function setupAnalyzeButton() {
         // ⚠️ TESTING MODE: Daily limit check REMOVED
         // This allows unlimited testing of analyze feature
         // TODO: Re-enable credit checks before production
-        /*
-        // Check if user can analyze (has credits or daily free)
-        const canAnalyze = await canUserAnalyze();
-        
-        if (!canAnalyze.allowed) {
-            if (canAnalyze.reason === 'no_credits') {
-                showBuyCreditsModal();
-                return;
-            }
-        }
-        */
         
         // Fetch analysis
         try {
@@ -91,6 +80,13 @@ function setupAnalyzeButton() {
                 selectedPersonality
             );
             
+            // ✅ VALIDATION: Check if API returned the prompt instead of analysis
+            if (analysis.includes('You are an AI job description analyzer') || 
+                analysis.includes('For 5-7 distinct pieces of jargon') ||
+                analysis.length < 100) {
+                throw new Error('Invalid response from AI. Please try again.');
+            }
+            
             // Store current analysis
             currentAnalysis = {
                 jobDescription,
@@ -100,23 +96,81 @@ function setupAnalyzeButton() {
                 id: Date.now()
             };
             
-            // ✅ CRITICAL FIX: Also store in window for resume/cover letter generators
+            // ✅ CRITICAL: Also store in window for resume/cover letter generators
             window.currentAnalysis = currentAnalysis;
             
             // Display results
             displayAnalysis(analysis);
             
-            // Show credit status (for testing only)
+            // ✅ AUTO-SAVE: Automatically save to Supabase
+            if (isUserLoggedIn()) {
+                await autoSaveAnalysis(currentAnalysis);
+            }
+            
+            // Show success message
             showToast('Analysis complete! (Testing mode - no credits deducted)');
             
         } catch (error) {
             console.error('Analysis error:', error);
-            // Error already shown by fetchJobAnalysis
+            showToast(error.message || 'Analysis failed. Please try again.', 'error');
         } finally {
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '🔍 Analyze This Job';
         }
     });
+}
+
+/**
+ * Auto-save analysis to Supabase (happens automatically after successful analysis)
+ */
+async function autoSaveAnalysis(analysis) {
+    try {
+        console.log('💾 Auto-saving analysis to Supabase...');
+        
+        // Check if Supabase is loaded
+        if (typeof supabase === 'undefined') {
+            console.warn('⚠️ Supabase not initialized, skipping auto-save');
+            return;
+        }
+        
+        // Save to Supabase
+        const { data, error } = await supabase
+            .from('analyses')
+            .insert([{
+                user_id: window.currentUser.id,
+                job_description: analysis.jobDescription,
+                analysis_result: analysis.analysis,
+                tone: analysis.personality,
+                persona: analysis.personality,
+                status: 'analyzed',
+                created_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+        
+        if (error) {
+            console.error('❌ Auto-save error:', error);
+            // Don't show error to user - it's a background save
+            return;
+        }
+        
+        console.log('✅ Analysis auto-saved to Supabase:', data);
+        
+        // Update Save button to show it's already saved
+        const saveBtn = document.getElementById('saveAnalysisBtn');
+        if (saveBtn) {
+            saveBtn.textContent = '✓ Saved';
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.6';
+        }
+        
+        // Show subtle success notification
+        showToast('✅ Analysis saved to dashboard!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Auto-save failed:', error);
+        // Silently fail - don't interrupt user experience
+    }
 }
 
 /**
@@ -130,7 +184,7 @@ function setupDemoButton() {
     demoBtn.addEventListener('click', () => {
         const demoAnalysis = getDemoAnalysis();
         
-        // ✅ Store demo analysis so Save/Resume/Cover Letter buttons work
+        // Store demo analysis so Save/Resume/Cover Letter buttons work
         currentAnalysis = {
             jobDescription: document.getElementById('jobDescription')?.value || 'Demo Job Description',
             analysis: demoAnalysis,
@@ -139,7 +193,7 @@ function setupDemoButton() {
             id: Date.now()
         };
         
-        // ✅ Also store in window for resume/cover letter generators
+        // Also store in window for resume/cover letter generators
         window.currentAnalysis = currentAnalysis;
         
         displayAnalysis(demoAnalysis);
@@ -201,7 +255,7 @@ function formatAnalysis(text) {
  * Setup action buttons (Save, Resume, Cover Letter)
  */
 function setupActionButtons() {
-    // Save Analysis - ✅ FIXED to handle errors gracefully
+    // Save Analysis - Manual backup (auto-save already happens)
     const saveBtn = document.getElementById('saveAnalysisBtn');
     if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
@@ -216,58 +270,65 @@ function setupActionButtons() {
                 return;
             }
             
+            // Check if already saved
+            if (saveBtn.textContent === '✓ Saved') {
+                showToast('Already saved! Redirecting to dashboard...');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+                return;
+            }
+            
             // Show loading state
             saveBtn.disabled = true;
             const originalText = saveBtn.textContent;
             saveBtn.textContent = '💾 Saving...';
             
             try {
-                // ✅ Check if Supabase is loaded
+                // Check if Supabase is loaded
                 if (typeof supabase === 'undefined') {
                     throw new Error('Supabase is not initialized. Please refresh the page.');
                 }
                 
-                // Save to Supabase using YOUR exact column names
+                // Save to Supabase
                 const { data, error } = await supabase
                     .from('analyses')
                     .insert([{
                         user_id: window.currentUser.id,
                         job_description: currentAnalysis.jobDescription,
                         analysis_result: currentAnalysis.analysis,
-                        tone: currentAnalysis.personality, // ✅ Maps to 'tone' column
-                        persona: currentAnalysis.personality, // ✅ Also save to 'persona' column
+                        tone: currentAnalysis.personality,
+                        persona: currentAnalysis.personality,
+                        status: 'analyzed',
                         created_at: new Date().toISOString()
                     }])
                     .select()
                     .single();
                 
                 if (error) {
-                    console.error('Supabase error:', error);
+                    console.error('Supabase save error:', error);
                     throw new Error(error.message);
                 }
                 
                 console.log('✅ Analysis saved successfully:', data);
+                saveBtn.textContent = '✓ Saved';
                 showToast('✅ Analysis saved to dashboard!');
                 
-                // Optional: Redirect to dashboard after 2 seconds
+                // Redirect to dashboard after 2 seconds
                 setTimeout(() => {
-                    if (confirm('View saved analysis in dashboard?')) {
-                        window.location.href = 'dashboard.html';
-                    }
+                    window.location.href = 'dashboard.html';
                 }, 2000);
                 
             } catch (error) {
                 console.error('❌ Error saving analysis:', error);
                 showToast(`Error saving: ${error.message}`, 'error');
-            } finally {
-                // Reset button
-                saveBtn.disabled = false;
                 saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
             }
         });
     }
     
-    // Generate Resume (Pro feature - connected to modal)
+    // Generate Resume (Pro feature)
     const resumeBtn = document.getElementById('generateResumeBtn');
     if (resumeBtn) {
         resumeBtn.addEventListener('click', () => {
@@ -276,7 +337,6 @@ function setupActionButtons() {
                 return;
             }
             
-            // Check if logged in
             if (!isUserLoggedIn()) {
                 showToast('Please log in to generate resumes');
                 showAuthModal();
@@ -288,7 +348,7 @@ function setupActionButtons() {
         });
     }
     
-    // Generate Cover Letter (Pro feature - connected to modal)
+    // Generate Cover Letter (Pro feature)
     const coverLetterBtn = document.getElementById('generateCoverLetterBtn');
     if (coverLetterBtn) {
         coverLetterBtn.addEventListener('click', () => {
@@ -297,7 +357,6 @@ function setupActionButtons() {
                 return;
             }
             
-            // Check if logged in
             if (!isUserLoggedIn()) {
                 showToast('Please log in to generate cover letters');
                 showAuthModal();
