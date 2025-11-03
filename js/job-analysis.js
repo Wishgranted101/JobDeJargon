@@ -1,6 +1,7 @@
 /**
  * Job Analysis Page Logic - Simplified Personality System
  * TESTING VERSION - Daily limit removed + Auto-save enabled
+ * Last Updated: November 3, 2025
  */
 
 let selectedPersonality = 'brutal-truth'; // Default
