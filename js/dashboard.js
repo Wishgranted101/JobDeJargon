@@ -18,8 +18,42 @@ let currentJobForModal = null;
 /**
  * Initialize dashboard
  */
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Dashboard initializing...');
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Dashboard page loaded, waiting for auth...');
+    
+    // First, check if the session is already loaded (for fast page navigation)
+    if (window.currentUser && window.currentUser.id) {
+        console.log('✅ User session already loaded, initializing dashboard...');
+        initializeDashboard();
+    } else {
+        console.log('⏳ Waiting for userSessionChanged event...');
+        // Wait for the custom event fired by auth.js when the session loads
+        window.addEventListener('userSessionChanged', () => {
+            console.log('✅ userSessionChanged event received!');
+            initializeDashboard();
+        }, { once: true });
+    }
+
+    // Also run a timeout check in case the event fires too quickly or is missed
+    setTimeout(() => {
+        if (!window.currentUser || !window.currentUser.id) {
+            console.error('❌ Session check timed out after 3 seconds. User may not be logged in.');
+            hideLoadingState();
+            showToast('Please log in to view your dashboard', 'warning');
+        }
+    }, 3000); // 3-second timeout
+});
+
+/**
+ * The main loading function - only runs after auth is confirmed
+ */
+async function initializeDashboard() {
+    if (!window.currentUser || !window.currentUser.id) {
+        console.error('❌ Cannot initialize dashboard - no user session');
+        return;
+    }
+    
+    console.log('✅ Auth confirmed. Loading dashboard data...');
     
     // Show loading state
     showLoadingState();
@@ -35,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     hideLoadingState();
     
     console.log('✅ Dashboard loaded successfully');
-});
+}
 
 /**
  * Show loading state
