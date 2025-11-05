@@ -3,6 +3,25 @@
 // COMPLETE VERSION with all helper functions
 // ⚠️ TESTING MODE - Credit checks DISABLED
 
+// ✅ Helper functions for localStorage
+function saveToLocal(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+    }
+}
+
+function loadFromLocal(key) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error('Error loading from localStorage:', error);
+        return null;
+    }
+}
+
 // Fetch job analysis with credit/daily free checking
 async function fetchJobAnalysis(jobDescription, personality = 'brutal-truth') {
     // ⚠️ TESTING MODE: Credit check DISABLED for testing
