@@ -1,7 +1,8 @@
 /**
  * Dashboard Logic - Job Application Tracker
  * FIXED: Now loads from Supabase with detailed logging
- * Last Updated: November 3, 2025
+ * FIXED: Action buttons now work properly
+ * Last Updated: November 4, 2025
  */
 
 let dashboardData = {
@@ -255,12 +256,47 @@ function renderSection(sectionId, jobs) {
     
     container.innerHTML = jobs.map(job => createJobCard(job, sectionId)).join('');
     
+    // ✅ CRITICAL FIX: Add event listeners AFTER HTML is rendered
     jobs.forEach(job => {
         const card = document.querySelector(`[data-job-id="${job.id}"]`);
-        if (card) {
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('.job-actions')) {
-                    openJobDetailModal(job, sectionId);
+        if (!card) return;
+        
+        // Click on card to open details
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.job-actions')) {
+                openJobDetailModal(job, sectionId);
+            }
+        });
+        
+        // ✅ Get the action buttons
+        const moveBtn = card.querySelector('[data-action="move"]');
+        const duplicateBtn = card.querySelector('[data-action="duplicate"]');
+        const deleteBtn = card.querySelector('[data-action="delete"]');
+        
+        // ✅ Add click handlers
+        if (moveBtn) {
+            moveBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('Move button clicked for job:', job.id);
+                currentJobForModal = { job, status: sectionId };
+                openMoveJobModal();
+            });
+        }
+        
+        if (duplicateBtn) {
+            duplicateBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('Duplicate button clicked for job:', job.id);
+                duplicateJob(job.id, sectionId);
+            });
+        }
+        
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('Delete button clicked for job:', job.id);
+                if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead if you want to keep the analysis.')) {
+                    deleteJob(job.id, sectionId);
                 }
             });
         }
@@ -288,13 +324,13 @@ function createJobCard(job, status) {
                 Added: ${date}
             </p>
             <div class="job-actions">
-                <button class="icon-btn" data-action="move" data-job-id="${job.id}" data-status="${status}" title="Move">
+                <button class="icon-btn" data-action="move" title="Move to another stage">
                     ➡️
                 </button>
-                <button class="icon-btn" data-action="duplicate" data-job-id="${job.id}" data-status="${status}" title="Duplicate">
+                <button class="icon-btn" data-action="duplicate" title="Duplicate this analysis">
                     📋
                 </button>
-                <button class="icon-btn" data-action="delete" data-job-id="${job.id}" data-status="${status}" title="Delete">
+                <button class="icon-btn" data-action="delete" title="Delete permanently">
                     🗑️
                 </button>
             </div>
@@ -395,7 +431,7 @@ function openJobDetailModal(job, currentStatus) {
     
     if (deleteBtn) {
         deleteBtn.onclick = () => {
-            if (confirm('Are you sure you want to delete this job?')) {
+            if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead if you want to keep the analysis.')) {
                 deleteJob(job.id, currentStatus);
                 closeJobDetailModal();
             }
@@ -520,19 +556,19 @@ function duplicateJob(jobId, status) {
         renderSection(status, dashboardData[status]);
         updateStats();
         
-        showToast('Job duplicated!');
+        showToast('✅ Job duplicated!');
     }
 }
 
 /**
- * Delete job
+ * Delete job - PERMANENTLY DELETES (no trash/undo)
  */
 async function deleteJob(jobId, status) {
     const index = dashboardData[status].findIndex(j => j.id == jobId);
     if (index !== -1) {
         dashboardData[status].splice(index, 1);
         
-        // Delete from Supabase
+        // Delete from Supabase (PERMANENT)
         try {
             const { error } = await supabase
                 .from('analyses')
@@ -541,17 +577,18 @@ async function deleteJob(jobId, status) {
             
             if (error) {
                 console.error('Error deleting from Supabase:', error);
+                showToast('⚠️ Error deleting from database', 'error');
             } else {
                 console.log(`✅ Deleted job ${jobId} from Supabase`);
+                showToast('🗑️ Job deleted permanently');
             }
         } catch (error) {
             console.error('Error deleting:', error);
+            showToast('⚠️ Error deleting job', 'error');
         }
         
         saveDashboardData();
         renderSection(status, dashboardData[status]);
         updateStats();
-        
-        showToast('Job deleted!');
     }
 }
