@@ -1,7 +1,6 @@
 /**
  * Dashboard Logic - Job Application Tracker
- * FIXED: All action buttons now work properly
- * FIXED: Move modal has clickable options
+ * FIXED: Works with existing HTML onclick handlers
  * Last Updated: November 5, 2025
  */
 
@@ -22,98 +21,30 @@ let currentJobForModal = null;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Dashboard page loaded, waiting for auth...');
     
-    // Setup move modal click handlers
-    setupMoveModalHandlers();
-    
-    // Setup close buttons for modals
-    setupModalCloseButtons();
-    
-    // First, check if the session is already loaded (for fast page navigation)
+    // First, check if the session is already loaded
     if (window.currentUser && window.currentUser.id) {
         console.log('✅ User session already loaded, initializing dashboard...');
         initializeDashboard();
     } else {
         console.log('⏳ Waiting for userSessionChanged event...');
-        // Wait for the custom event fired by auth.js when the session loads
         window.addEventListener('userSessionChanged', () => {
             console.log('✅ userSessionChanged event received!');
             initializeDashboard();
         }, { once: true });
     }
 
-    // Also run a timeout check in case the event fires too quickly or is missed
+    // Timeout check
     setTimeout(() => {
         if (!window.currentUser || !window.currentUser.id) {
-            console.error('❌ Session check timed out after 3 seconds. User may not be logged in.');
+            console.error('❌ Session check timed out after 3 seconds.');
             hideLoadingState();
             showToast('Please log in to view your dashboard', 'warning');
         }
-    }, 3000); // 3-second timeout
+    }, 3000);
 });
 
 /**
- * Setup move modal handlers - Make status options clickable
- */
-function setupMoveModalHandlers() {
-    console.log('🔧 Setting up move modal handlers...');
-    
-    // Add click handlers to each status button
-    const statusButtons = [
-        { id: 'moveToAnalyzed', status: 'analyzed' },
-        { id: 'moveToToApply', status: 'toApply' },
-        { id: 'moveToApplied', status: 'applied' },
-        { id: 'moveToInterviewed', status: 'interviewed' },
-        { id: 'moveToOffers', status: 'offers' },
-        { id: 'moveToRejected', status: 'rejected' }
-    ];
-    
-    statusButtons.forEach(({ id, status }) => {
-        const button = document.getElementById(id);
-        if (button) {
-            // Remove any existing listeners
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            
-            // Add new click listener
-            newButton.addEventListener('click', () => {
-                console.log(`✅ Status button clicked: ${status}`);
-                moveJobTo(status);
-            });
-            
-            console.log(`✅ Added click handler for: ${id}`);
-        } else {
-            console.warn(`⚠️ Button not found: ${id}`);
-        }
-    });
-}
-
-/**
- * Setup modal close buttons
- */
-function setupModalCloseButtons() {
-    // Close job detail modal
-    const closeDetailBtn = document.querySelector('#jobDetailModal .close-modal');
-    if (closeDetailBtn) {
-        closeDetailBtn.addEventListener('click', closeJobDetailModal);
-    }
-    
-    // Close move modal
-    const closeMoveBtn = document.querySelector('#moveJobModal .close-modal');
-    if (closeMoveBtn) {
-        closeMoveBtn.addEventListener('click', closeMoveJobModal);
-    }
-    
-    // Close modals when clicking outside
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
-            if (e.target.id === 'jobDetailModal') closeJobDetailModal();
-            if (e.target.id === 'moveJobModal') closeMoveJobModal();
-        }
-    });
-}
-
-/**
- * The main loading function - only runs after auth is confirmed
+ * Initialize dashboard
  */
 async function initializeDashboard() {
     if (!window.currentUser || !window.currentUser.id) {
@@ -122,20 +53,11 @@ async function initializeDashboard() {
     }
     
     console.log('✅ Auth confirmed. Loading dashboard data...');
-    
-    // Show loading state
     showLoadingState();
-    
-    // Load data from Supabase
     await loadDashboardData();
-    
-    // Render everything
     renderAllSections();
     updateStats();
-    
-    // Hide loading state
     hideLoadingState();
-    
     console.log('✅ Dashboard loaded successfully');
 }
 
@@ -143,7 +65,7 @@ async function initializeDashboard() {
  * Show loading state
  */
 function showLoadingState() {
-    const container = document.querySelector('.dashboard-container') || document.body;
+    const container = document.querySelector('.container') || document.body;
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'dashboardLoading';
     loadingDiv.innerHTML = `
@@ -168,11 +90,8 @@ function hideLoadingState() {
  */
 async function loadDashboardData() {
     console.log('🔍 Loading dashboard data...');
-    console.log('📊 Current User:', window.currentUser);
-    console.log('🔌 Supabase available?', typeof supabase !== 'undefined');
     
     try {
-        // Check if user is logged in
         if (!window.currentUser || !window.currentUser.id) {
             console.error('❌ User not logged in');
             showToast('Please log in to view your dashboard', 'warning');
@@ -180,9 +99,8 @@ async function loadDashboardData() {
         }
         
         console.log('✅ User ID:', window.currentUser.id);
-        
-        // Fetch analyses from Supabase
         console.log('📡 Fetching from Supabase...');
+        
         const { data, error } = await supabase
             .from('analyses')
             .select('*')
@@ -222,27 +140,14 @@ async function loadDashboardData() {
                     status: analysis.status || 'analyzed'
                 };
                 
-                // Add to appropriate status array
                 const status = job.status || 'analyzed';
                 if (dashboardData[status]) {
                     dashboardData[status].push(job);
                     console.log(`📌 Added job to ${status}:`, job.id);
                 }
             });
-            
-            console.log('📊 Dashboard data loaded:', {
-                analyzed: dashboardData.analyzed.length,
-                toApply: dashboardData.toApply.length,
-                applied: dashboardData.applied.length,
-                interviewed: dashboardData.interviewed.length,
-                offers: dashboardData.offers.length,
-                rejected: dashboardData.rejected.length
-            });
-        } else {
-            console.log('ℹ️ No saved analyses found');
         }
         
-        // Save to localStorage for offline access
         saveDashboardData();
         
     } catch (error) {
@@ -252,37 +157,37 @@ async function loadDashboardData() {
 }
 
 /**
- * Save dashboard data to localStorage (for offline access)
+ * Save to localStorage
  */
 function saveDashboardData() {
     saveToLocal('dashboardData', dashboardData);
 }
 
 /**
- * Save status update to Supabase
+ * Update job status in Supabase
  */
 async function updateJobStatusInSupabase(jobId, newStatus) {
     try {
+        console.log(`📡 Updating Supabase: job ${jobId} → ${newStatus}`);
         const { error } = await supabase
             .from('analyses')
             .update({ status: newStatus })
             .eq('id', jobId);
         
         if (error) {
-            console.error('Error updating status in Supabase:', error);
+            console.error('❌ Supabase update error:', error);
             return false;
-        } else {
-            console.log(`✅ Updated job ${jobId} status to ${newStatus}`);
-            return true;
         }
+        console.log(`✅ Supabase updated successfully`);
+        return true;
     } catch (error) {
-        console.error('Error updating Supabase:', error);
+        console.error('❌ Error updating Supabase:', error);
         return false;
     }
 }
 
 /**
- * Render all dashboard sections
+ * Render all sections
  */
 function renderAllSections() {
     console.log('🎨 Rendering all sections...');
@@ -295,13 +200,13 @@ function renderAllSections() {
 }
 
 /**
- * Render a specific dashboard section
+ * Render a section
  */
 function renderSection(sectionId, jobs) {
     const container = document.getElementById(`${sectionId}Section`);
     
     if (!container) {
-        console.warn(`⚠️ Container not found for section: ${sectionId}`);
+        console.warn(`⚠️ Container not found: ${sectionId}`);
         return;
     }
     
@@ -320,59 +225,65 @@ function renderSection(sectionId, jobs) {
     
     container.innerHTML = jobs.map(job => createJobCard(job, sectionId)).join('');
     
-    // ✅ CRITICAL: Add event listeners AFTER HTML is rendered
+    // Add event listeners after rendering
     jobs.forEach(job => {
-        const card = document.querySelector(`[data-job-id="${job.id}"][data-status="${sectionId}"]`);
-        if (!card) {
-            console.warn(`⚠️ Card not found for job ${job.id} in ${sectionId}`);
-            return;
-        }
-        
-        console.log(`✅ Adding listeners to job ${job.id} in ${sectionId}`);
-        
-        // Click on card to open details
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.job-actions') && !e.target.closest('.icon-btn')) {
-                openJobDetailModal(job, sectionId);
-            }
-        });
-        
-        // ✅ Get the action buttons
-        const moveBtn = card.querySelector('[data-action="move"]');
-        const duplicateBtn = card.querySelector('[data-action="duplicate"]');
-        const deleteBtn = card.querySelector('[data-action="delete"]');
-        
-        // ✅ Add click handlers - Make sure to stop propagation
-        if (moveBtn) {
-            moveBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔄 Move button clicked for job:', job.id);
-                currentJobForModal = { job, status: sectionId };
-                openMoveJobModal();
-            });
-        }
-        
-        if (duplicateBtn) {
-            duplicateBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('📋 Duplicate button clicked for job:', job.id);
-                duplicateJob(job.id, sectionId);
-            });
-        }
-        
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🗑️ Delete button clicked for job:', job.id);
-                if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead if you want to keep the analysis.')) {
-                    deleteJob(job.id, sectionId);
-                }
-            });
+        attachJobCardListeners(job.id, sectionId);
+    });
+}
+
+/**
+ * Attach event listeners to a job card
+ */
+function attachJobCardListeners(jobId, status) {
+    const card = document.querySelector(`[data-job-id="${jobId}"]`);
+    if (!card) {
+        console.warn(`⚠️ Card not found: ${jobId}`);
+        return;
+    }
+    
+    // Click card to open details
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest('.job-actions')) {
+            const job = dashboardData[status].find(j => j.id === jobId);
+            if (job) openJobDetailModal(job, status);
         }
     });
+    
+    // Move button
+    const moveBtn = card.querySelector('[data-action="move"]');
+    if (moveBtn) {
+        moveBtn.onclick = (e) => {
+            e.stopPropagation();
+            const job = dashboardData[status].find(j => j.id === jobId);
+            if (job) {
+                currentJobForModal = { job, status };
+                console.log('🔄 Move clicked, set currentJobForModal:', currentJobForModal);
+                openMoveJobModal();
+            }
+        };
+    }
+    
+    // Duplicate button
+    const duplicateBtn = card.querySelector('[data-action="duplicate"]');
+    if (duplicateBtn) {
+        duplicateBtn.onclick = (e) => {
+            e.stopPropagation();
+            console.log('📋 Duplicate clicked for:', jobId);
+            duplicateJob(jobId, status);
+        };
+    }
+    
+    // Delete button
+    const deleteBtn = card.querySelector('[data-action="delete"]');
+    if (deleteBtn) {
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            console.log('🗑️ Delete clicked for:', jobId);
+            if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead.')) {
+                deleteJob(jobId, status);
+            }
+        };
+    }
 }
 
 /**
@@ -383,7 +294,7 @@ function createJobCard(job, status) {
     const date = new Date(job.timestamp).toLocaleDateString();
     
     return `
-        <div class="job-card" data-job-id="${job.id}" data-status="${status}">
+        <div class="job-card" data-job-id="${job.id}">
             <div class="job-card-header">
                 <div>
                     <div class="job-title">${jobTitle}</div>
@@ -411,7 +322,7 @@ function createJobCard(job, status) {
 }
 
 /**
- * Extract job title from description
+ * Extract job title
  */
 function extractJobTitle(description) {
     const lines = description.split('\n');
@@ -424,26 +335,15 @@ function extractJobTitle(description) {
 }
 
 /**
- * Update statistics
+ * Update stats
  */
 function updateStats() {
-    const statElements = {
-        statAnalyzed: dashboardData.analyzed.length,
-        statToApply: dashboardData.toApply.length,
-        statApplied: dashboardData.applied.length,
-        statInterviewed: dashboardData.interviewed.length,
-        statOffers: dashboardData.offers.length,
-        statRejected: dashboardData.rejected.length
-    };
-    
-    Object.entries(statElements).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
-        }
-    });
-    
-    console.log('📊 Stats updated:', statElements);
+    document.getElementById('statAnalyzed').textContent = dashboardData.analyzed.length;
+    document.getElementById('statToApply').textContent = dashboardData.toApply.length;
+    document.getElementById('statApplied').textContent = dashboardData.applied.length;
+    document.getElementById('statInterviewed').textContent = dashboardData.interviewed.length;
+    document.getElementById('statOffers').textContent = dashboardData.offers.length;
+    document.getElementById('statRejected').textContent = dashboardData.rejected.length;
 }
 
 /**
@@ -483,32 +383,23 @@ function openJobDetailModal(job, currentStatus) {
     
     modal.classList.add('active');
     
-    const moveBtn = document.getElementById('modalMoveBtn');
-    const duplicateBtn = document.getElementById('modalDuplicateBtn');
-    const deleteBtn = document.getElementById('modalDeleteBtn');
+    // Set up modal button handlers
+    document.getElementById('modalMoveBtn').onclick = () => {
+        closeJobDetailModal();
+        openMoveJobModal();
+    };
     
-    if (moveBtn) {
-        moveBtn.onclick = () => {
+    document.getElementById('modalDuplicateBtn').onclick = () => {
+        duplicateJob(job.id, currentStatus);
+        closeJobDetailModal();
+    };
+    
+    document.getElementById('modalDeleteBtn').onclick = () => {
+        if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead.')) {
+            deleteJob(job.id, currentStatus);
             closeJobDetailModal();
-            openMoveJobModal();
-        };
-    }
-    
-    if (duplicateBtn) {
-        duplicateBtn.onclick = () => {
-            duplicateJob(job.id, currentStatus);
-            closeJobDetailModal();
-        };
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.onclick = () => {
-            if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead if you want to keep the analysis.')) {
-                deleteJob(job.id, currentStatus);
-                closeJobDetailModal();
-            }
-        };
-    }
+        }
+    };
 }
 
 /**
@@ -516,13 +407,11 @@ function openJobDetailModal(job, currentStatus) {
  */
 function closeJobDetailModal() {
     const modal = document.getElementById('jobDetailModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    if (modal) modal.classList.remove('active');
 }
 
 /**
- * Format status for display
+ * Format status
  */
 function formatStatus(status) {
     const statusMap = {
@@ -540,14 +429,12 @@ function formatStatus(status) {
  * Open move job modal
  */
 function openMoveJobModal() {
-    console.log('📂 Opening move modal for job:', currentJobForModal);
+    console.log('📂 Opening move modal. Current job:', currentJobForModal);
     const modal = document.getElementById('moveJobModal');
     if (modal) {
         modal.classList.add('active');
-        // Re-setup handlers each time modal opens (in case DOM was updated)
-        setupMoveModalHandlers();
     } else {
-        console.error('❌ Move modal not found in DOM');
+        console.error('❌ Move modal not found');
     }
 }
 
@@ -556,19 +443,20 @@ function openMoveJobModal() {
  */
 function closeMoveJobModal() {
     const modal = document.getElementById('moveJobModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    if (modal) modal.classList.remove('active');
 }
 
 /**
- * Move job to different status
+ * Move job to different status - Called by HTML onclick
  */
 async function moveJobTo(newStatus) {
-    console.log('🚀 Moving job to:', newStatus);
+    console.log('🚀 moveJobTo called with:', newStatus);
+    console.log('📦 currentJobForModal:', currentJobForModal);
     
     if (!currentJobForModal) {
-        console.error('❌ No job selected to move');
+        console.error('❌ No job selected to move!');
+        showToast('Error: No job selected', 'error');
+        closeMoveJobModal();
         return;
     }
     
@@ -578,45 +466,44 @@ async function moveJobTo(newStatus) {
     
     // Don't move if already in that status
     if (oldStatus === newStatus) {
-        console.log('ℹ️ Job already in that status');
+        console.log('ℹ️ Already in that status');
         closeMoveJobModal();
+        showToast('Job is already in that status', 'info');
         return;
     }
     
-    // Remove from old status
+    // Remove from old array
     const oldIndex = dashboardData[oldStatus].findIndex(j => j.id === job.id);
     if (oldIndex !== -1) {
         dashboardData[oldStatus].splice(oldIndex, 1);
         console.log(`✅ Removed from ${oldStatus}`);
+    } else {
+        console.warn(`⚠️ Job not found in ${oldStatus}`);
     }
     
-    // Add to new status
+    // Add to new array
     job.status = newStatus;
     dashboardData[newStatus].push(job);
     console.log(`✅ Added to ${newStatus}`);
     
-    // Update in Supabase
+    // Update Supabase
     const success = await updateJobStatusInSupabase(job.id, newStatus);
     
     if (success) {
-        // Save to localStorage
         saveDashboardData();
-        
-        // Re-render sections
         renderAllSections();
         updateStats();
-        
-        // Close modals
         closeMoveJobModal();
         closeJobDetailModal();
-        
         showToast(`✅ Moved to ${formatStatus(newStatus)}!`);
-        console.log('✅ Move completed successfully');
+        console.log('✅ Move completed');
     } else {
         // Revert on error
         dashboardData[newStatus] = dashboardData[newStatus].filter(j => j.id !== job.id);
         job.status = oldStatus;
         dashboardData[oldStatus].push(job);
+        renderAllSections();
+        updateStats();
         showToast('❌ Error moving job. Please try again.', 'error');
         console.error('❌ Move failed, reverted');
     }
@@ -630,110 +517,100 @@ async function duplicateJob(jobId, status) {
     
     const job = dashboardData[status].find(j => j.id == jobId);
     if (!job) {
-        console.error('❌ Job not found for duplication');
+        console.error('❌ Job not found');
         showToast('❌ Error: Job not found', 'error');
         return;
     }
     
-    // Create duplicate with new ID and timestamp
-    const duplicate = {
-        ...job,
-        id: Date.now(), // Temporary ID for UI
-        timestamp: new Date().toISOString()
-    };
-    
-    console.log('Creating duplicate:', duplicate);
-    
     try {
-        // Save to Supabase first
+        // Save to Supabase
         const { data, error } = await supabase
             .from('analyses')
             .insert([{
                 user_id: window.currentUser.id,
-                job_description: duplicate.jobDescription,
-                analysis_result: duplicate.analysis,
-                tone: duplicate.tone,
-                persona: duplicate.persona,
+                job_description: job.jobDescription,
+                analysis_result: job.analysis,
+                tone: job.tone,
+                persona: job.persona,
                 status: status,
-                created_at: duplicate.timestamp
+                created_at: new Date().toISOString()
             }])
             .select()
             .single();
         
         if (error) {
-            console.error('❌ Error duplicating in Supabase:', error);
+            console.error('❌ Duplicate error:', error);
             showToast('❌ Error duplicating job', 'error');
             return;
         }
         
-        // Use the real ID from Supabase
-        duplicate.id = data.id;
-        console.log('✅ Duplicate saved to Supabase with ID:', data.id);
+        console.log('✅ Duplicate saved with ID:', data.id);
         
         // Add to dashboard
+        const duplicate = {
+            id: data.id,
+            jobDescription: job.jobDescription,
+            analysis: job.analysis,
+            tone: job.tone,
+            persona: job.persona,
+            timestamp: data.created_at,
+            status: status
+        };
+        
         dashboardData[status].push(duplicate);
-        
-        // Save to localStorage
         saveDashboardData();
-        
-        // Re-render section
         renderSection(status, dashboardData[status]);
         updateStats();
-        
         showToast('✅ Job duplicated successfully!');
-        console.log('✅ Duplication completed');
         
     } catch (error) {
-        console.error('❌ Error in duplicateJob:', error);
+        console.error('❌ Error duplicating:', error);
         showToast('❌ Error duplicating job', 'error');
     }
 }
 
 /**
- * Delete job - PERMANENTLY DELETES (no trash/undo)
+ * Delete job permanently
  */
 async function deleteJob(jobId, status) {
     console.log(`🗑️ Deleting job ${jobId} from ${status}`);
     
     const index = dashboardData[status].findIndex(j => j.id == jobId);
     if (index === -1) {
-        console.error('❌ Job not found for deletion');
+        console.error('❌ Job not found');
         showToast('❌ Error: Job not found', 'error');
         return;
     }
     
-    // Store job in case we need to restore on error
     const deletedJob = dashboardData[status][index];
     
-    // Remove from UI immediately
+    // Remove from UI
     dashboardData[status].splice(index, 1);
     renderSection(status, dashboardData[status]);
     updateStats();
     
-    console.log('🗑️ Removed from UI, deleting from Supabase...');
-    
     try {
-        // Delete from Supabase (PERMANENT)
+        // Delete from Supabase
         const { error } = await supabase
             .from('analyses')
             .delete()
             .eq('id', jobId);
         
         if (error) {
-            console.error('❌ Error deleting from Supabase:', error);
-            // Restore the job
+            console.error('❌ Delete error:', error);
+            // Restore on error
             dashboardData[status].splice(index, 0, deletedJob);
             renderSection(status, dashboardData[status]);
             updateStats();
             showToast('❌ Error deleting job. Please try again.', 'error');
         } else {
-            console.log(`✅ Deleted job ${jobId} from Supabase`);
+            console.log(`✅ Deleted from Supabase`);
             saveDashboardData();
             showToast('🗑️ Job deleted permanently');
         }
     } catch (error) {
         console.error('❌ Error deleting:', error);
-        // Restore the job
+        // Restore on error
         dashboardData[status].splice(index, 0, deletedJob);
         renderSection(status, dashboardData[status]);
         updateStats();
