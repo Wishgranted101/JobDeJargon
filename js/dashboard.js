@@ -255,45 +255,14 @@ function renderSection(sectionId, jobs) {
     
     container.innerHTML = jobs.map(job => createJobCard(job, sectionId)).join('');
     
-    // Add event listeners to job cards and action buttons
     jobs.forEach(job => {
         const card = document.querySelector(`[data-job-id="${job.id}"]`);
         if (card) {
-            // Click on card to open details
             card.addEventListener('click', (e) => {
                 if (!e.target.closest('.job-actions')) {
                     openJobDetailModal(job, sectionId);
                 }
             });
-            
-            // Add button click handlers
-            const moveBtn = card.querySelector('[data-action="move"]');
-            const duplicateBtn = card.querySelector('[data-action="duplicate"]');
-            const deleteBtn = card.querySelector('[data-action="delete"]');
-            
-            if (moveBtn) {
-                moveBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    currentJobForModal = { job, status: sectionId };
-                    openMoveJobModal();
-                });
-            }
-            
-            if (duplicateBtn) {
-                duplicateBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    duplicateJob(job.id, sectionId);
-                });
-            }
-            
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Delete this job analysis?')) {
-                        deleteJob(job.id, sectionId);
-                    }
-                });
-            }
         }
     });
 }
