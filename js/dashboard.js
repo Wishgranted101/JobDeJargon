@@ -450,11 +450,13 @@ function closeMoveJobModal() {
  * Move job to different status - Called by HTML onclick
  */
 async function moveJobTo(newStatus) {
-    console.log('🚀 moveJobTo called with:', newStatus);
-    console.log('📦 currentJobForModal:', currentJobForModal);
+    console.log('🚀 ============ MOVE STARTED ============');
+    console.log('🚀 Target status:', newStatus);
+    console.log('🚀 currentJobForModal:', currentJobForModal);
     
     if (!currentJobForModal) {
         console.error('❌ No job selected to move!');
+        console.error('❌ currentJobForModal is null/undefined');
         showToast('Error: No job selected', 'error');
         closeMoveJobModal();
         return;
@@ -462,28 +464,66 @@ async function moveJobTo(newStatus) {
     
     const { job, status: oldStatus } = currentJobForModal;
     
-    console.log(`Moving job ${job.id} from ${oldStatus} to ${newStatus}`);
+    console.log(`🚀 Moving job ${job.id} from "${oldStatus}" to "${newStatus}"`);
+    console.log(`🚀 Job data:`, job);
     
     // Don't move if already in that status
     if (oldStatus === newStatus) {
-        console.log('ℹ️ Already in that status');
+        console.log('ℹ️ Already in that status, aborting');
         closeMoveJobModal();
         showToast('Job is already in that status', 'info');
         return;
     }
     
     // Remove from old array
+    console.log(`🚀 Searching for job in ${oldStatus} array...`);
+    console.log(`🚀 Array contents:`, dashboardData[oldStatus].map(j => ({ id: j.id, title: extractJobTitle(j.jobDescription) })));
+    
     const oldIndex = dashboardData[oldStatus].findIndex(j => j.id === job.id);
+    console.log(`🚀 Found at index: ${oldIndex}`);
+    
     if (oldIndex !== -1) {
         dashboardData[oldStatus].splice(oldIndex, 1);
         console.log(`✅ Removed from ${oldStatus}`);
+        console.log(`✅ ${oldStatus} array now has ${dashboardData[oldStatus].length} items`);
     } else {
-        console.warn(`⚠️ Job not found in ${oldStatus}`);
+        console.warn(`⚠️ Job not found in ${oldStatus} array!`);
     }
     
     // Add to new array
     job.status = newStatus;
     dashboardData[newStatus].push(job);
+    console.log(`✅ Added to ${newStatus}`);
+    console.log(`✅ ${newStatus} array now has ${dashboardData[newStatus].length} items`);
+    
+    // Update Supabase
+    console.log(`🚀 Updating Supabase...`);
+    const success = await updateJobStatusInSupabase(job.id, newStatus);
+    console.log(`🚀 Supabase update result: ${success}`);
+    
+    if (success) {
+        console.log(`✅ Move successful, saving and re-rendering...`);
+        saveDashboardData();
+        renderAllSections();
+        updateStats();
+        closeMoveJobModal();
+        closeJobDetailModal();
+        showToast(`✅ Moved to ${formatStatus(newStatus)}!`);
+        console.log('✅ Move completed successfully');
+    } else {
+        console.error(`❌ Supabase update failed, reverting...`);
+        // Revert on error
+        dashboardData[newStatus] = dashboardData[newStatus].filter(j => j.id !== job.id);
+        job.status = oldStatus;
+        dashboardData[oldStatus].push(job);
+        renderAllSections();
+        updateStats();
+        showToast('❌ Error moving job. Please try again.', 'error');
+        console.error('❌ Move failed and reverted');
+    }
+    
+    console.log('🚀 ============ MOVE ENDED ============');
+}(job);
     console.log(`✅ Added to ${newStatus}`);
     
     // Update Supabase
@@ -513,33 +553,46 @@ async function moveJobTo(newStatus) {
  * Duplicate job
  */
 async function duplicateJob(jobId, status) {
-    console.log(`📋 Duplicating job ${jobId} from ${status}`);
+    console.log(`📋 ============ DUPLICATE STARTED ============`);
+    console.log(`📋 Job ID: ${jobId}`);
+    console.log(`📋 Status: ${status}`);
     
     const job = dashboardData[status].find(j => j.id == jobId);
+    console.log(`📋 Found job:`, job);
+    
     if (!job) {
-        console.error('❌ Job not found');
+        console.error('❌ Job not found for duplication');
+        console.log('❌ All jobs in status:', dashboardData[status].map(j => j.id));
         showToast('❌ Error: Job not found', 'error');
         return;
     }
     
     try {
-        // Save to Supabase
+        console.log(`📋 Creating duplicate in Supabase...`);
+        console.log(`📋 User ID:`, window.currentUser?.id);
+        
+        const insertData = {
+            user_id: window.currentUser.id,
+            job_description: job.jobDescription,
+            analysis_result: job.analysis,
+            tone: job.tone,
+            persona: job.persona,
+            status: status,
+            created_at: new Date().toISOString()
+        };
+        console.log(`📋 Insert data:`, insertData);
+        
         const { data, error } = await supabase
             .from('analyses')
-            .insert([{
-                user_id: window.currentUser.id,
-                job_description: job.jobDescription,
-                analysis_result: job.analysis,
-                tone: job.tone,
-                persona: job.persona,
-                status: status,
-                created_at: new Date().toISOString()
-            }])
+            .insert([insertData])
             .select()
             .single();
         
+        console.log(`📋 Supabase response:`, { data, error });
+        
         if (error) {
             console.error('❌ Duplicate error:', error);
+            console.error('❌ Error details:', JSON.stringify(error));
             showToast('❌ Error duplicating job', 'error');
             return;
         }
@@ -557,14 +610,20 @@ async function duplicateJob(jobId, status) {
             status: status
         };
         
+        console.log(`📋 Adding to dashboard array:`, duplicate);
         dashboardData[status].push(duplicate);
+        
+        console.log(`📋 Re-rendering section...`);
         saveDashboardData();
         renderSection(status, dashboardData[status]);
         updateStats();
+        
         showToast('✅ Job duplicated successfully!');
+        console.log(`📋 ============ DUPLICATE ENDED ============`);
         
     } catch (error) {
-        console.error('❌ Error duplicating:', error);
+        console.error('❌ Exception during duplicate:', error);
+        console.error('❌ Error stack:', error.stack);
         showToast('❌ Error duplicating job', 'error');
     }
 }
@@ -573,47 +632,70 @@ async function duplicateJob(jobId, status) {
  * Delete job permanently
  */
 async function deleteJob(jobId, status) {
-    console.log(`🗑️ Deleting job ${jobId} from ${status}`);
+    console.log(`🗑️ ============ DELETE STARTED ============`);
+    console.log(`🗑️ Job ID: ${jobId}`);
+    console.log(`🗑️ Status: ${status}`);
+    console.log(`🗑️ Current data in ${status}:`, dashboardData[status]);
     
     const index = dashboardData[status].findIndex(j => j.id == jobId);
+    console.log(`🗑️ Found at index: ${index}`);
+    
     if (index === -1) {
-        console.error('❌ Job not found');
+        console.error('❌ Job not found in array!');
+        console.log('❌ All jobs in status:', dashboardData[status].map(j => j.id));
         showToast('❌ Error: Job not found', 'error');
         return;
     }
     
     const deletedJob = dashboardData[status][index];
+    console.log(`🗑️ Deleting job:`, deletedJob);
     
     // Remove from UI
+    console.log(`🗑️ Removing from array...`);
     dashboardData[status].splice(index, 1);
+    console.log(`🗑️ Array after removal:`, dashboardData[status]);
+    
+    console.log(`🗑️ Re-rendering section...`);
     renderSection(status, dashboardData[status]);
     updateStats();
+    console.log(`🗑️ UI updated`);
     
     try {
-        // Delete from Supabase
-        const { error } = await supabase
+        console.log(`🗑️ Attempting Supabase delete...`);
+        console.log(`🗑️ Supabase available?`, typeof supabase !== 'undefined');
+        console.log(`🗑️ Job ID type:`, typeof jobId, jobId);
+        
+        const { data, error } = await supabase
             .from('analyses')
             .delete()
-            .eq('id', jobId);
+            .eq('id', jobId)
+            .select();
+        
+        console.log(`🗑️ Supabase response:`, { data, error });
         
         if (error) {
-            console.error('❌ Delete error:', error);
+            console.error('❌ Supabase delete error:', error);
+            console.error('❌ Error details:', JSON.stringify(error));
             // Restore on error
             dashboardData[status].splice(index, 0, deletedJob);
             renderSection(status, dashboardData[status]);
             updateStats();
-            showToast('❌ Error deleting job. Please try again.', 'error');
+            showToast('❌ Error deleting from database. Job restored.', 'error');
         } else {
-            console.log(`✅ Deleted from Supabase`);
+            console.log(`✅ Successfully deleted from Supabase!`);
+            console.log(`✅ Deleted data:`, data);
             saveDashboardData();
             showToast('🗑️ Job deleted permanently');
         }
     } catch (error) {
-        console.error('❌ Error deleting:', error);
+        console.error('❌ Exception during delete:', error);
+        console.error('❌ Error stack:', error.stack);
         // Restore on error
         dashboardData[status].splice(index, 0, deletedJob);
         renderSection(status, dashboardData[status]);
         updateStats();
-        showToast('❌ Error deleting job. Please try again.', 'error');
+        showToast('❌ Error deleting job. Job restored.', 'error');
     }
+    
+    console.log(`🗑️ ============ DELETE ENDED ============`);
 }
