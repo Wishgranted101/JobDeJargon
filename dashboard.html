@@ -22,7 +22,51 @@
             font-weight: 600;
         }
         
-        /* CRITICAL: Modal styles for dashboard.js */
+        /* 📁 Collapsible Section Styles */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .section-header:hover {
+            background: var(--background);
+            border-color: var(--primary);
+        }
+        
+        .collapse-icon {
+            font-size: 1rem;
+            transition: transform 0.3s;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .section-header h3 {
+            margin: 0;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        /* CRITICAL: Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -138,43 +182,85 @@
             </div>
         </div>
 
+        <!-- 📂 Analyzed Section -->
         <div class="dashboard-section">
-            <h3>📂 Analyzed</h3>
+            <div class="section-header" data-section="analyzed">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    📂 Analyzed
+                    <span class="section-count" id="countAnalyzed">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="analyzedSection">
                 <p style="color: var(--text-secondary);">No analyzed jobs yet. Start by analyzing a job description!</p>
             </div>
         </div>
 
+        <!-- 🕓 To Apply Section -->
         <div class="dashboard-section">
-            <h3>🕓 To Apply</h3>
+            <div class="section-header" data-section="toApply">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    🕓 To Apply
+                    <span class="section-count" id="countToApply">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="toApplySection">
                 <p style="color: var(--text-secondary);">Move jobs here when you're ready to apply.</p>
             </div>
         </div>
 
+        <!-- ✅ Applied Section -->
         <div class="dashboard-section">
-            <h3>✅ Applied</h3>
+            <div class="section-header" data-section="applied">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    ✅ Applied
+                    <span class="section-count" id="countApplied">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="appliedSection">
                 <p style="color: var(--text-secondary);">No applications submitted yet.</p>
             </div>
         </div>
 
+        <!-- 💬 Interviewed Section -->
         <div class="dashboard-section">
-            <h3>💬 Interviewed</h3>
+            <div class="section-header" data-section="interviewed">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    💬 Interviewed
+                    <span class="section-count" id="countInterviewed">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="interviewedSection">
                 <p style="color: var(--text-secondary);">No interviews scheduled yet.</p>
             </div>
         </div>
 
+        <!-- 🏆 Offers Section -->
         <div class="dashboard-section">
-            <h3>🏆 Offers</h3>
+            <div class="section-header" data-section="offers">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    🏆 Offers
+                    <span class="section-count" id="countOffers">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="offersSection">
                 <p style="color: var(--text-secondary);">No offers received yet.</p>
             </div>
         </div>
 
+        <!-- ❌ Rejected Section -->
         <div class="dashboard-section">
-            <h3>❌ Rejected</h3>
+            <div class="section-header" data-section="rejected">
+                <span class="collapse-icon">▼</span>
+                <h3>
+                    ❌ Rejected
+                    <span class="section-count" id="countRejected">0</span>
+                </h3>
+            </div>
             <div class="job-cards" id="rejectedSection">
                 <p style="color: var(--text-secondary);">No rejections tracked.</p>
             </div>
@@ -255,28 +341,23 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/api.js"></script>
-   <script src="js/dashboard.js?v=nov3"></script>
+   <script src="js/dashboard.js?v=nov5collapsible"></script>
     
     <script>
-        // ⚠️ AUTHENTICATION GUARD - Must run IMMEDIATELY, not in DOMContentLoaded
-        // Check authentication synchronously
+        // ⚠️ AUTHENTICATION GUARD
         (function() {
-            // Wait a tiny bit for Supabase to load
             let checkCount = 0;
             const maxChecks = 10;
             
             const checkAuth = setInterval(() => {
                 checkCount++;
                 
-                // If isUserLoggedIn function exists, check it
                 if (typeof isUserLoggedIn === 'function') {
                     clearInterval(checkAuth);
                     
                     if (!isUserLoggedIn()) {
-                        // Block the page content
                         document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: system-ui;"><div style="text-align: center;"><h2>🔒 Authentication Required</h2><p style="color: #666; margin: 1rem 0;">Redirecting to login...</p></div></div>';
                         
-                        // Redirect after a moment
                         setTimeout(() => {
                             sessionStorage.setItem('redirectAfterLogin', 'dashboard.html');
                             window.location.href = 'login.html';
@@ -284,13 +365,25 @@
                     }
                 }
                 
-                // Give up after max checks (5 seconds)
                 if (checkCount >= maxChecks) {
                     clearInterval(checkAuth);
                     console.error('⚠️ Authentication check timed out');
                 }
             }, 500);
         })();
+        
+        // 📁 Update section count badges
+        function updateSectionCounts() {
+            document.getElementById('countAnalyzed').textContent = document.getElementById('statAnalyzed').textContent;
+            document.getElementById('countToApply').textContent = document.getElementById('statToApply').textContent;
+            document.getElementById('countApplied').textContent = document.getElementById('statApplied').textContent;
+            document.getElementById('countInterviewed').textContent = document.getElementById('statInterviewed').textContent;
+            document.getElementById('countOffers').textContent = document.getElementById('statOffers').textContent;
+            document.getElementById('countRejected').textContent = document.getElementById('statRejected').textContent;
+        }
+        
+        // Call this after stats are updated
+        setInterval(updateSectionCounts, 500);
     </script>
 </body>
 </html>
