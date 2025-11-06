@@ -1,7 +1,6 @@
 /**
  * Dashboard Logic - Job Application Tracker
- * SAFE RECOVERY VERSION - Will restore all data from Supabase
- * Includes detailed logging to debug button issues
+ * WITH COLLAPSIBLE SECTIONS - Clean, organized view
  * Last Updated: November 5, 2025
  */
 
@@ -16,13 +15,22 @@ let dashboardData = {
 
 let currentJobForModal = null;
 
+// Track which sections are collapsed (saved in localStorage)
+let collapsedSections = loadFromLocal('collapsedSections') || {
+    analyzed: false,
+    toApply: false,
+    applied: true,  // Default: collapsed
+    interviewed: true,  // Default: collapsed
+    offers: false,
+    rejected: true  // Default: collapsed
+};
+
 /**
  * Initialize dashboard
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Dashboard page loaded, waiting for auth...');
     
-    // First, check if the session is already loaded
     if (window.currentUser && window.currentUser.id) {
         console.log('✅ User session already loaded, initializing dashboard...');
         initializeDashboard();
@@ -43,9 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3000);
 });
 
-/**
- * Initialize dashboard
- */
 async function initializeDashboard() {
     if (!window.currentUser || !window.currentUser.id) {
         console.error('❌ Cannot initialize dashboard - no user session');
@@ -57,6 +62,7 @@ async function initializeDashboard() {
     await loadDashboardData();
     renderAllSections();
     updateStats();
+    setupCollapseListeners();
     hideLoadingState();
     console.log('✅ Dashboard loaded successfully');
 }
@@ -79,9 +85,6 @@ function hideLoadingState() {
     if (loading) loading.remove();
 }
 
-/**
- * 🛟 SAFE Load - Will restore all your data from Supabase
- */
 async function loadDashboardData() {
     console.log('🔍 ============ LOADING DATA ============');
     
@@ -114,7 +117,6 @@ async function loadDashboardData() {
             return;
         }
         
-        // 🛟 SAFE: Clear and rebuild arrays
         console.log('🔄 Rebuilding dashboard data...');
         dashboardData = {
             analyzed: [],
@@ -125,7 +127,6 @@ async function loadDashboardData() {
             rejected: []
         };
         
-        // Convert Supabase data
         data.forEach(analysis => {
             const job = {
                 id: analysis.id,
@@ -184,14 +185,58 @@ async function updateJobStatusInSupabase(jobId, newStatus) {
     }
 }
 
+/**
+ * 📁 Setup collapse/expand listeners for section headers
+ */
+function setupCollapseListeners() {
+    const sections = ['analyzed', 'toApply', 'applied', 'interviewed', 'offers', 'rejected'];
+    
+    sections.forEach(sectionId => {
+        const header = document.querySelector(`[data-section="${sectionId}"]`);
+        if (header) {
+            header.style.cursor = 'pointer';
+            header.onclick = () => toggleSection(sectionId);
+        }
+    });
+}
+
+/**
+ * 📁 Toggle section collapsed/expanded
+ */
+function toggleSection(sectionId) {
+    collapsedSections[sectionId] = !collapsedSections[sectionId];
+    saveToLocal('collapsedSections', collapsedSections);
+    updateSectionVisibility(sectionId);
+}
+
+/**
+ * 📁 Update section visibility and icon
+ */
+function updateSectionVisibility(sectionId) {
+    const container = document.getElementById(`${sectionId}Section`);
+    const icon = document.querySelector(`[data-section="${sectionId}"] .collapse-icon`);
+    
+    if (!container || !icon) return;
+    
+    const isCollapsed = collapsedSections[sectionId];
+    
+    if (isCollapsed) {
+        container.style.display = 'none';
+        icon.textContent = '▶';
+    } else {
+        container.style.display = 'grid';
+        icon.textContent = '▼';
+    }
+}
+
 function renderAllSections() {
     console.log('🎨 Rendering all sections...');
-    renderSection('analyzed', dashboardData.analyzed);
-    renderSection('toApply', dashboardData.toApply);
-    renderSection('applied', dashboardData.applied);
-    renderSection('interviewed', dashboardData.interviewed);
-    renderSection('offers', dashboardData.offers);
-    renderSection('rejected', dashboardData.rejected);
+    const sections = ['analyzed', 'toApply', 'applied', 'interviewed', 'offers', 'rejected'];
+    
+    sections.forEach(sectionId => {
+        renderSection(sectionId, dashboardData[sectionId]);
+        updateSectionVisibility(sectionId);
+    });
 }
 
 function renderSection(sectionId, jobs) {
@@ -211,21 +256,17 @@ function renderSection(sectionId, jobs) {
             offers: 'No offers received yet.',
             rejected: 'No rejections tracked.'
         };
-        container.innerHTML = `<p style="color: var(--text-secondary);">${emptyMessages[sectionId]}</p>`;
+        container.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1/-1;">${emptyMessages[sectionId]}</p>`;
         return;
     }
     
     container.innerHTML = jobs.map(job => createJobCard(job, sectionId)).join('');
     
-    // Attach event listeners
     jobs.forEach(job => {
         attachJobCardListeners(job.id, sectionId);
     });
 }
 
-/**
- * 🔧 FIXED: Attach event listeners properly
- */
 function attachJobCardListeners(jobId, status) {
     const card = document.querySelector(`[data-job-id="${jobId}"]`);
     if (!card) {
@@ -233,9 +274,6 @@ function attachJobCardListeners(jobId, status) {
         return;
     }
     
-    console.log(`🔧 Attaching listeners to job ${jobId}`);
-    
-    // Click card to open details
     card.addEventListener('click', (e) => {
         if (!e.target.closest('.job-actions')) {
             const job = dashboardData[status].find(j => j.id === jobId);
@@ -243,37 +281,30 @@ function attachJobCardListeners(jobId, status) {
         }
     });
     
-    // Move button
     const moveBtn = card.querySelector('[data-action="move"]');
     if (moveBtn) {
         moveBtn.onclick = (e) => {
             e.stopPropagation();
-            console.log(`🔄 Move clicked for job ${jobId}`);
             const job = dashboardData[status].find(j => j.id === jobId);
             if (job) {
                 currentJobForModal = { job, status };
-                console.log('✅ Set currentJobForModal:', currentJobForModal);
                 openMoveJobModal();
             }
         };
     }
     
-    // Duplicate button
     const duplicateBtn = card.querySelector('[data-action="duplicate"]');
     if (duplicateBtn) {
         duplicateBtn.onclick = (e) => {
             e.stopPropagation();
-            console.log(`📋 Duplicate clicked for job ${jobId}`);
             duplicateJob(jobId, status);
         };
     }
     
-    // Delete button
     const deleteBtn = card.querySelector('[data-action="delete"]');
     if (deleteBtn) {
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
-            console.log(`🗑️ Delete clicked for job ${jobId}`);
             if (confirm('⚠️ Delete this job analysis?\n\nThis cannot be undone. Consider moving it to "Rejected" instead.')) {
                 deleteJob(jobId, status);
             }
@@ -402,11 +433,8 @@ function formatStatus(status) {
 }
 
 function openMoveJobModal() {
-    console.log('📂 Opening move modal. Current job:', currentJobForModal);
     const modal = document.getElementById('moveJobModal');
-    if (modal) {
-        modal.classList.add('active');
-    }
+    if (modal) modal.classList.add('active');
 }
 
 function closeMoveJobModal() {
@@ -414,43 +442,28 @@ function closeMoveJobModal() {
     if (modal) modal.classList.remove('active');
 }
 
-/**
- * 🔧 FIXED: Move job with detailed logging
- */
 async function moveJobTo(newStatus) {
-    console.log('🚀 ===== MOVE STARTED =====');
-    console.log('Target:', newStatus);
-    console.log('Current job:', currentJobForModal);
-    
     if (!currentJobForModal) {
-        console.error('❌ ERROR: No job selected!');
         showToast('Error: No job selected', 'error');
         closeMoveJobModal();
         return;
     }
     
     const { job, status: oldStatus } = currentJobForModal;
-    console.log(`Moving job ${job.id} from "${oldStatus}" to "${newStatus}"`);
     
     if (oldStatus === newStatus) {
-        console.log('Already in that status');
         closeMoveJobModal();
         return;
     }
     
-    // Remove from old
     const oldIndex = dashboardData[oldStatus].findIndex(j => j.id === job.id);
     if (oldIndex !== -1) {
         dashboardData[oldStatus].splice(oldIndex, 1);
-        console.log(`✅ Removed from ${oldStatus}`);
     }
     
-    // Add to new
     job.status = newStatus;
     dashboardData[newStatus].push(job);
-    console.log(`✅ Added to ${newStatus}`);
     
-    // Update Supabase
     const success = await updateJobStatusInSupabase(job.id, newStatus);
     
     if (success) {
@@ -460,31 +473,19 @@ async function moveJobTo(newStatus) {
         closeMoveJobModal();
         closeJobDetailModal();
         showToast(`✅ Moved to ${formatStatus(newStatus)}!`);
-        console.log('✅ Move complete');
     } else {
-        // Revert
         dashboardData[newStatus] = dashboardData[newStatus].filter(j => j.id !== job.id);
         job.status = oldStatus;
         dashboardData[oldStatus].push(job);
         renderAllSections();
         updateStats();
         showToast('❌ Error moving job', 'error');
-        console.error('❌ Move failed');
     }
-    
-    console.log('🚀 ===== MOVE ENDED =====');
 }
 
-/**
- * 🔧 FIXED: Duplicate with detailed logging
- */
 async function duplicateJob(jobId, status) {
-    console.log('📋 ===== DUPLICATE STARTED =====');
-    console.log('Job ID:', jobId, 'Status:', status);
-    
     const job = dashboardData[status].find(j => j.id == jobId);
     if (!job) {
-        console.error('❌ Job not found');
         showToast('❌ Error: Job not found', 'error');
         return;
     }
@@ -505,12 +506,9 @@ async function duplicateJob(jobId, status) {
             .single();
         
         if (error) {
-            console.error('❌ Supabase error:', error);
             showToast('❌ Error duplicating job', 'error');
             return;
         }
-        
-        console.log('✅ Created duplicate with ID:', data.id);
         
         const duplicate = {
             id: data.id,
@@ -527,65 +525,44 @@ async function duplicateJob(jobId, status) {
         renderSection(status, dashboardData[status]);
         updateStats();
         showToast('✅ Job duplicated!');
-        console.log('📋 ===== DUPLICATE COMPLETE =====');
         
     } catch (error) {
-        console.error('❌ Exception:', error);
         showToast('❌ Error duplicating job', 'error');
     }
 }
 
-/**
- * 🔧 FIXED: Delete with detailed logging and proper refresh
- */
 async function deleteJob(jobId, status) {
-    console.log('🗑️ ===== DELETE STARTED =====');
-    console.log('Job ID:', jobId, 'Status:', status);
-    
     const index = dashboardData[status].findIndex(j => j.id == jobId);
     if (index === -1) {
-        console.error('❌ Job not found in array');
         showToast('❌ Error: Job not found', 'error');
         return;
     }
     
     const deletedJob = dashboardData[status][index];
     
-    // Remove from UI immediately
     dashboardData[status].splice(index, 1);
-    console.log('✅ Removed from local array');
-    
-    // Re-render immediately so user sees it's gone
     renderSection(status, dashboardData[status]);
     updateStats();
     
     try {
-        // Delete from Supabase
         const { error } = await supabase
             .from('analyses')
             .delete()
             .eq('id', jobId);
         
         if (error) {
-            console.error('❌ Supabase delete error:', error);
-            // Restore on error
             dashboardData[status].splice(index, 0, deletedJob);
             renderSection(status, dashboardData[status]);
             updateStats();
             showToast('❌ Error deleting. Job restored.', 'error');
         } else {
-            console.log('✅ Deleted from Supabase');
             saveDashboardData();
             showToast('🗑️ Job deleted permanently');
         }
     } catch (error) {
-        console.error('❌ Exception:', error);
-        // Restore on error
         dashboardData[status].splice(index, 0, deletedJob);
         renderSection(status, dashboardData[status]);
         updateStats();
         showToast('❌ Error deleting. Job restored.', 'error');
     }
-    
-    console.log('🗑️ ===== DELETE ENDED =====');
 }
